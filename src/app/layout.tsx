@@ -4,6 +4,7 @@ import { Inter } from "next/font/google";
 import { ThemeProvider } from "@dashboardpack/core/providers/theme-provider";
 import { LocaleProvider } from "@dashboardpack/core/lib/i18n/locale-context";
 import { Toaster } from "@dashboardpack/core/components/ui/sonner";
+import { AuthProvider } from "@/providers/auth-provider";
 import "./globals.css";
 
 const jetbrainsMono = localFont({
@@ -56,8 +57,10 @@ export default function RootLayout({
             >
               Skip to content
             </a>
-            {children}
-            <Toaster richColors closeButton />
+            <AuthProvider>
+              {children}
+              <Toaster richColors closeButton />
+            </AuthProvider>
           </LocaleProvider>
         </ThemeProvider>
       </body>

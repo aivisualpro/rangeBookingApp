@@ -9,7 +9,7 @@ import { PageHeader } from "@dashboardpack/core/components/shared/page-header";
 import { Switch } from "@dashboardpack/core/components/ui/switch";
 import { toast } from "sonner";
 
-export default function EditCustomerPage({ params }: { params: Promise<{ id: string }> }) {
+export default function EditCompanyPage({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter();
   const { id } = use(params);
   const [formData, setFormData] = useState<any>(null);
@@ -17,7 +17,7 @@ export default function EditCustomerPage({ params }: { params: Promise<{ id: str
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    fetch(`/api/customers/${id}`)
+    fetch(`/api/companies/${id}`)
       .then((res) => res.json())
       .then((data) => {
         if (data.data) setFormData(data.data);
@@ -29,7 +29,7 @@ export default function EditCustomerPage({ params }: { params: Promise<{ id: str
     e.preventDefault();
     setSaving(true);
     try {
-      const res = await fetch(`/api/customers/${id}`, {
+      const res = await fetch(`/api/companies/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -41,10 +41,10 @@ export default function EditCustomerPage({ params }: { params: Promise<{ id: str
         }),
       });
 
-      if (!res.ok) throw new Error("Failed to update customer");
+      if (!res.ok) throw new Error("Failed to update company");
 
-      toast.success("Customer updated successfully!");
-      router.push("/customers");
+      toast.success("Company updated successfully!");
+      router.push("/companies");
     } catch (err: any) {
       toast.error(err.message || "An error occurred");
     } finally {
@@ -57,7 +57,7 @@ export default function EditCustomerPage({ params }: { params: Promise<{ id: str
   return (
     <div className="max-w-2xl">
       <div className="mb-6">
-        <PageHeader title="Edit Customer" description="Update Range Company internal settings." breadcrumbs={[{ label: "Dashboard", href: "/" }, { label: "Customers", href: "/customers" }, { label: "Edit" }]} />
+        <PageHeader title="Edit Company" description="Update Range Company internal settings." breadcrumbs={[{ label: "Dashboard", href: "/" }, { label: "Companies", href: "/companies" }, { label: "Edit" }]} />
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6 rounded-lg border bg-card p-6 shadow-sm">

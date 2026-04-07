@@ -2,6 +2,9 @@
 
 import { toast } from "sonner";
 import Link from "next/link";
+import { signIn } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { Github } from "lucide-react";
 import { Button } from "@dashboardpack/core/components/ui/button";
 import { Input } from "@dashboardpack/core/components/ui/input";
@@ -17,9 +20,23 @@ import {
 } from "@dashboardpack/core/components/ui/card";
 
 export default function LoginPage() {
-  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+  const router = useRouter();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    toast.info("Demo mode — no backend connected");
+    setLoading(true);
+    const res = await signIn("credentials", { email, password, redirect: false });
+    setLoading(false);
+    
+    if (res?.error) {
+      toast.error(res.error);
+    } else {
+      toast.success("Signed in successfully!");
+      router.push("/dashboard");
+    }
   }
 
   return (
@@ -38,6 +55,8 @@ export default function LoginPage() {
                 id="email"
                 type="email"
                 placeholder="name@example.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 required
               />
             </div>
@@ -47,6 +66,8 @@ export default function LoginPage() {
                 id="password"
                 type="password"
                 placeholder="Enter your password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 required
               />
             </div>
@@ -64,8 +85,8 @@ export default function LoginPage() {
                 Forgot password?
               </Link>
             </div>
-            <Button type="submit" className="w-full">
-              Sign in
+            <Button type="submit" disabled={loading} className="w-full">
+              {loading ? "Signing in..." : "Sign in"}
             </Button>
           </form>
 
@@ -77,7 +98,7 @@ export default function LoginPage() {
           </div>
 
           <div className="grid grid-cols-2 gap-3">
-            <Button variant="outline" type="button">
+            <Button variant="outline" type="button" onClick={() => signIn("google", { callbackUrl: "/dashboard" })}>
               <svg
                 className="size-4"
                 viewBox="0 0 24 24"

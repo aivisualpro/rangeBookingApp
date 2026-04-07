@@ -10,7 +10,7 @@ export async function GET() {
     const companies = await Company.find().sort({ createdAt: -1 }).limit(100);
     return NextResponse.json({ data: companies });
   } catch (error: any) {
-    console.error("GET /api/customers error:", error.message);
+    console.error("GET /api/companies error:", error.message);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
@@ -40,7 +40,7 @@ export async function POST(req: Request) {
 
     return NextResponse.json({ success: true, data: { id: newCompany._id } });
   } catch (error: any) {
-    console.error("POST /api/customers error:", error.message);
-    return NextResponse.json({ error: error.message || "Failed to create customer" }, { status: 500 });
+    console.error("POST /api/companies error:", error.message);
+    return NextResponse.json({ error: error.message || "Failed to create company" }, { status: 500 });
   }
 }

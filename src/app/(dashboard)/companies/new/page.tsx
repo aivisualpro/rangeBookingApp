@@ -9,7 +9,7 @@ import { PageHeader } from "@dashboardpack/core/components/shared/page-header";
 import { Switch } from "@dashboardpack/core/components/ui/switch";
 import { toast } from "sonner";
 
-export default function NewCustomerPage() {
+export default function NewCompanyPage() {
   const router = useRouter();
   const [formData, setFormData] = useState({
     company_name: "",
@@ -25,16 +25,16 @@ export default function NewCustomerPage() {
     e.preventDefault();
     setLoading(true);
     try {
-      const res = await fetch("/api/customers", {
+      const res = await fetch("/api/companies", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       });
 
-      if (!res.ok) throw new Error("Failed to create customer");
+      if (!res.ok) throw new Error("Failed to create company");
 
-      toast.success("Customer created successfully!");
-      router.push("/customers");
+      toast.success("Company created successfully!");
+      router.push("/companies");
     } catch (err: any) {
       toast.error(err.message || "An error occurred");
     } finally {
@@ -45,7 +45,7 @@ export default function NewCustomerPage() {
   return (
     <div className="max-w-2xl">
       <div className="mb-6">
-        <PageHeader title="New Customer" description="Create a new Range Company and add their default admin user." breadcrumbs={[{ label: "Dashboard", href: "/" }, { label: "Customers", href: "/customers" }, { label: "New" }]} />
+        <PageHeader title="New Company" description="Create a new Range Company and add their default admin user." breadcrumbs={[{ label: "Dashboard", href: "/" }, { label: "Companies", href: "/companies" }, { label: "New" }]} />
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6 rounded-lg border bg-card p-6 shadow-sm">
@@ -82,7 +82,7 @@ export default function NewCustomerPage() {
 
         <div className="flex justify-end gap-3 pt-4">
           <Button variant="outline" type="button" onClick={() => router.back()}>Cancel</Button>
-          <Button type="submit" disabled={loading}>{loading ? "Saving..." : "Create Customer"}</Button>
+          <Button type="submit" disabled={loading}>{loading ? "Saving..." : "Create Company"}</Button>
         </div>
       </form>
     </div>

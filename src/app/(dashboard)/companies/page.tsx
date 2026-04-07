@@ -12,38 +12,38 @@ import { DataTable, DataTableColumnHeader } from "@dashboardpack/core/components
 import { ConfirmDialog } from "@dashboardpack/core/components/shared/confirm-dialog";
 import { toast } from "sonner";
 
-export default function CustomersPage() {
+export default function CompaniesPage() {
   const router = useRouter();
-  const [customers, setCustomers] = useState<any[]>([]);
+  const [companies, setCompanies] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [deleteId, setDeleteId] = useState<string | null>(null);
 
-  const fetchCustomers = async () => {
+  const fetchCompanies = async () => {
     setIsLoading(true);
     try {
-      const res = await fetch("/api/customers");
+      const res = await fetch("/api/companies");
       const json = await res.json();
       if (json.data) {
-        setCustomers(json.data);
+        setCompanies(json.data);
       }
     } catch (err) {
-      toast.error("Failed to fetch customers");
+      toast.error("Failed to fetch companies");
     } finally {
       setIsLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchCustomers();
+    fetchCompanies();
   }, []);
 
   const handleDelete = async () => {
     if (!deleteId) return;
     try {
-      const res = await fetch(`/api/customers/${deleteId}`, { method: "DELETE" });
+      const res = await fetch(`/api/companies/${deleteId}`, { method: "DELETE" });
       if (res.ok) {
-        toast.success("Customer and associated users deleted.");
-        fetchCustomers();
+        toast.success("Company and associated users deleted.");
+        fetchCompanies();
       } else {
         toast.error("Failed to delete.");
       }
@@ -97,7 +97,7 @@ export default function CustomersPage() {
       id: "actions",
       cell: ({ row }) => (
         <div className="flex items-center gap-1 justify-end">
-          <Button variant="ghost" size="icon" onClick={(e) => { e.stopPropagation(); router.push(`/customers/${row.original.id}/edit`); }}>
+          <Button variant="ghost" size="icon" onClick={(e) => { e.stopPropagation(); router.push(`/companies/${row.original.id}/edit`); }}>
             <Pencil className="h-4 w-4" />
           </Button>
           <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive" onClick={(e) => { e.stopPropagation(); setDeleteId(row.original.id); }}>
@@ -111,8 +111,8 @@ export default function CustomersPage() {
   return (
     <>
       <div className="mb-6">
-        <PageHeader title="Customers" description="Manage Range Companies and their settings." breadcrumbs={[{ label: "Dashboard", href: "/" }, { label: "Customers" }]}>
-          <Button onClick={() => router.push("/customers/new")} className="gap-2">
+        <PageHeader title="Companies" description="Manage Range Companies and their settings." breadcrumbs={[{ label: "Dashboard", href: "/" }, { label: "Companies" }]}>
+          <Button onClick={() => router.push("/companies/new")} className="gap-2">
             <Plus className="h-4 w-4" /> Add Company
           </Button>
         </PageHeader>
@@ -120,15 +120,15 @@ export default function CustomersPage() {
 
       <DataTable
         columns={columns}
-        data={customers}
+        data={companies}
         searchPlaceholder="Search companies..."
-        emptyMessage="No customers found."
+        emptyMessage="No companies found."
       />
 
       <ConfirmDialog
         open={!!deleteId}
         onOpenChange={(v) => !v && setDeleteId(null)}
-        title="Delete Customer"
+        title="Delete Company"
         description="Are you sure you want to delete this company? This will also remove any users assigned to to it."
         confirmLabel="Delete"
         variant="destructive"

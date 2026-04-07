@@ -2,6 +2,9 @@
 
 import { toast } from "sonner";
 import Link from "next/link";
+import { signIn } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { Github } from "lucide-react";
 import { Button } from "@dashboardpack/core/components/ui/button";
 import { Input } from "@dashboardpack/core/components/ui/input";
@@ -17,9 +20,39 @@ import {
 } from "@dashboardpack/core/components/ui/card";
 
 export default function RegisterPage() {
-  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+  const router = useRouter();
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    toast.info("Demo mode — no backend connected");
+    if (password !== confirmPassword) {
+      return toast.error("Passwords do not match");
+    }
+    setLoading(true);
+    
+    try {
+      const res = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, email, password })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error);
+      
+      toast.success("Account created! Signing you in...");
+      const signInRes = await signIn("credentials", { email, password, redirect: false });
+      if (signInRes?.error) throw new Error(signInRes.error);
+      
+      router.push("/dashboard");
+    } catch (err: any) {
+      toast.error(err.message || "An error occurred");
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -40,6 +73,8 @@ export default function RegisterPage() {
                 id="name"
                 type="text"
                 placeholder="John Doe"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
                 required
               />
             </div>
@@ -49,6 +84,8 @@ export default function RegisterPage() {
                 id="email"
                 type="email"
                 placeholder="name@example.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 required
               />
             </div>
@@ -58,6 +95,8 @@ export default function RegisterPage() {
                 id="password"
                 type="password"
                 placeholder="Create a password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 required
               />
             </div>
@@ -67,6 +106,8 @@ export default function RegisterPage() {
                 id="confirm-password"
                 type="password"
                 placeholder="Confirm your password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
                 required
               />
             </div>
@@ -83,8 +124,8 @@ export default function RegisterPage() {
                 </span>
               </Label>
             </div>
-            <Button type="submit" className="w-full">
-              Create account
+            <Button type="submit" disabled={loading} className="w-full">
+              {loading ? "Creating account..." : "Create account"}
             </Button>
           </form>
 
@@ -96,7 +137,7 @@ export default function RegisterPage() {
           </div>
 
           <div className="grid grid-cols-2 gap-3">
-            <Button variant="outline" type="button">
+            <Button variant="outline" type="button" onClick={() => signIn("google", { callbackUrl: "/dashboard" })}>
               <svg
                 className="size-4"
                 viewBox="0 0 24 24"

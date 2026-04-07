@@ -40,6 +40,7 @@ import {
   Globe,
   Radar,
   DollarSign,
+  Crosshair,
 } from "lucide-react";
 
 export interface NavItem {
@@ -106,7 +107,8 @@ export const systemNav: NavGroup = {
   tKey: "sidebar.system",
   items: [
     { icon: UserCog, label: "Users", href: "/users", tKey: "sidebar.users" },
-    { icon: Users, label: "Customers", href: "/customers" },
+    { icon: Users, label: "Companies", href: "/companies" },
+    { icon: Crosshair, label: "Bays", href: "/bays" },
     { icon: Bell, label: "Alerts", href: "/notifications", badge: "5", tKey: "sidebar.notifications" },
     { icon: Settings, label: "Settings", href: "/settings", tKey: "sidebar.settings" },
     { icon: HelpCircle, label: "Help & Support", href: "/support", tKey: "sidebar.helpSupport" },

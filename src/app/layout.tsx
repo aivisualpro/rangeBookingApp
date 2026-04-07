@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
+import { Inter } from "next/font/google";
 import { ThemeProvider } from "@dashboardpack/core/providers/theme-provider";
 import { LocaleProvider } from "@dashboardpack/core/lib/i18n/locale-context";
 import { Toaster } from "@dashboardpack/core/components/ui/sonner";
@@ -16,6 +17,11 @@ const jetbrainsMono = localFont({
   variable: "--font-jetbrains-mono",
 });
 
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-inter",
+});
+
 export const metadata: Metadata = {
   title: "Range Booking App",
   description:
@@ -28,7 +34,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning className={`${jetbrainsMono.variable} ${inter.variable}`}>
       <head>
         <script
           dangerouslySetInnerHTML={{
@@ -36,11 +42,12 @@ export default function RootLayout({
 (function(){try{var c=localStorage.getItem("signal-color-preset");var p={"matrix":[165,0.22],"cyan":[195,0.18],"violet":[280,0.18],"amber":[60,0.18],"red":[25,0.20],"frost":[220,0.04]};if(c&&p[c]){var s=document.documentElement.style;var v="oklch(0.55 "+p[c][1]+" "+p[c][0]+")";s.setProperty("--primary",v);s.setProperty("--primary-foreground","oklch(1 0 0)");s.setProperty("--sidebar-primary",v);s.setProperty("--chart-1",v);s.setProperty("--ring",v)}}catch(e){}})();
 (function(){try{var l=localStorage.getItem("signal-layout");if(l==="topnav"){document.documentElement.classList.add("layout-topnav")}else{document.documentElement.classList.add("layout-sidebar")}}catch(e){document.documentElement.classList.add("layout-sidebar")}})();
 (function(){try{var b=localStorage.getItem("signal-container");if(b==="boxed"){document.documentElement.classList.add("container-boxed")}else{document.documentElement.classList.add("container-fluid")}}catch(e){document.documentElement.classList.add("container-fluid")}})();
-(function(){try{var r=localStorage.getItem("signal-direction");if(r==="rtl"){document.documentElement.dir="rtl";document.documentElement.classList.add("dir-rtl")}else{document.documentElement.dir="ltr";document.documentElement.classList.add("dir-ltr")}}catch(e){document.documentElement.dir="ltr";document.documentElement.classList.add("dir-ltr")}})();`,
+(function(){try{var r=localStorage.getItem("signal-direction");if(r==="rtl"){document.documentElement.dir="rtl";document.documentElement.classList.add("dir-rtl")}else{document.documentElement.dir="ltr";document.documentElement.classList.add("dir-ltr")}}catch(e){document.documentElement.dir="ltr";document.documentElement.classList.add("dir-ltr")}})();
+(function(){try{var f=localStorage.getItem("signal-font");if(f==="inter"){document.documentElement.classList.add("font-inter")}else{document.documentElement.classList.add("font-jetbrains")}}catch(e){document.documentElement.classList.add("font-jetbrains")}})();`,
           }}
         />
       </head>
-      <body className={`${jetbrainsMono.variable} antialiased`}>
+      <body className="antialiased">
         <ThemeProvider defaultTheme="system">
           <LocaleProvider>
             <a

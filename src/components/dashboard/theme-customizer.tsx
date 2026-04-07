@@ -13,7 +13,7 @@ import {
 import { Separator } from "@dashboardpack/core/components/ui/separator";
 import { Button } from "@dashboardpack/core/components/ui/button";
 import { Label } from "@dashboardpack/core/components/ui/label";
-import { Sun, Moon, Monitor, Rows3, Rows4, StretchHorizontal, PanelLeft, PanelTop, Maximize, Minimize, AlignLeft, AlignRight, Globe } from "lucide-react";
+import { Sun, Moon, Monitor, Rows3, Rows4, StretchHorizontal, PanelLeft, PanelTop, Maximize, Minimize, AlignLeft, AlignRight, Globe, Type } from "lucide-react";
 import { useSidebar } from "@dashboardpack/core/providers/sidebar-context";
 import type { LayoutMode, ContainerMode, DirectionMode } from "@dashboardpack/core/providers/sidebar-context";
 import { cn } from "@dashboardpack/core/lib/utils";
@@ -53,6 +53,29 @@ function applyColorPreset(preset: ColorPreset) {
   root.setProperty("--sidebar-primary", primary);
   root.setProperty("--chart-1", primary);
   root.setProperty("--ring", primary);
+}
+
+/* ------------------------------------------------------------------ */
+/*  Font                                                               */
+/* ------------------------------------------------------------------ */
+
+type FontValue = "jetbrains" | "inter";
+
+const FONT_OPTIONS = [
+  { value: "jetbrains" as const, label: "JetBrains", icon: Type },
+  { value: "inter" as const, label: "Inter", icon: Type },
+];
+
+const FONT_STORAGE_KEY = "signal-font";
+const FONT_CLASSES: Record<FontValue, string> = {
+  jetbrains: "font-jetbrains",
+  inter: "font-inter",
+};
+
+function applyFont(value: FontValue) {
+  const root = document.documentElement;
+  Object.values(FONT_CLASSES).forEach((cls) => root.classList.remove(cls));
+  root.classList.add(FONT_CLASSES[value]);
 }
 
 /* ------------------------------------------------------------------ */
@@ -121,6 +144,18 @@ export function ThemeCustomizer({ open, onOpenChange }: ThemeCustomizerProps) {
     applyColorPreset(preset);
   }
 
+  /* --- Font state --- */
+  const [font, setFont] = useState<FontValue>(() => {
+    if (typeof window === "undefined") return "jetbrains";
+    return (localStorage.getItem(FONT_STORAGE_KEY) as FontValue) || "jetbrains";
+  });
+
+  function handleFont(value: FontValue) {
+    setFont(value);
+    localStorage.setItem(FONT_STORAGE_KEY, value);
+    applyFont(value);
+  }
+
   /* --- Density state --- */
   const [density, setDensity] = useState<DensityValue>(() => {
     if (typeof window === "undefined") return "comfortable";
@@ -140,6 +175,9 @@ export function ThemeCustomizer({ open, onOpenChange }: ThemeCustomizerProps) {
     setColorPreset(defaultColor.key);
     localStorage.setItem(COLOR_STORAGE_KEY, defaultColor.key);
     applyColorPreset(defaultColor);
+    setFont("jetbrains");
+    localStorage.setItem(FONT_STORAGE_KEY, "jetbrains");
+    applyFont("jetbrains");
     setDensity("comfortable");
     localStorage.setItem(DENSITY_STORAGE_KEY, "comfortable");
     applyDensity("comfortable");
@@ -223,6 +261,35 @@ export function ThemeCustomizer({ open, onOpenChange }: ThemeCustomizerProps) {
                   </span>
                 </button>
               ))}
+            </div>
+          </div>
+
+          <Separator />
+
+          {/* ---- Font ---- */}
+          <div className="space-y-3">
+            <Label>Font</Label>
+            <div className="grid grid-cols-2 gap-2">
+              {FONT_OPTIONS.map((opt) => {
+                const Icon = opt.icon;
+                return (
+                  <button
+                    key={opt.value}
+                    onClick={() => handleFont(opt.value)}
+                    className={cn(
+                      "flex flex-col items-center gap-1.5 rounded-lg border-2 p-3 transition-all",
+                      font === opt.value
+                        ? "border-primary bg-primary/5 text-primary"
+                        : "border-border hover:border-primary/30"
+                    )}
+                  >
+                    <Icon className={cn("h-5 w-5", font === opt.value ? "text-primary" : "text-muted-foreground")} />
+                    <span className={cn("text-xs font-medium", font === opt.value ? "text-primary" : "text-muted-foreground")}>
+                      {opt.label}
+                    </span>
+                  </button>
+                );
+              })}
             </div>
           </div>
 

@@ -166,6 +166,17 @@
   }
 }
 
+/* Fonts */
+.font-inter {
+  --font-sans: var(--font-inter);
+  --font-mono: var(--font-jetbrains-mono);
+}
+
+.font-jetbrains {
+  --font-sans: var(--font-jetbrains-mono);
+  --font-mono: var(--font-jetbrains-mono);
+}
+
 /* Refined scrollbar */
 ::-webkit-scrollbar {
   width: 5px;

@@ -29,7 +29,6 @@ import {
   FormLabel,
   FormMessage,
 } from "@dashboardpack/core/components/ui/form";
-import { PageHeader } from "@dashboardpack/core/components/shared/page-header";
 import { Checkbox } from "@dashboardpack/core/components/ui/checkbox";
 import {
   getUserById,
@@ -129,18 +128,7 @@ export default function EditUser({
 
   return (
     <>
-      <div className="mb-6">
-        <PageHeader
-          title={`Edit ${user.name}`}
-          description="Update user information and permissions."
-          breadcrumbs={[
-            { label: "Dashboard", href: "/" },
-            { label: "Users", href: "/users" },
-            { label: user.name, href: `/users/${user.id}` },
-            { label: "Edit" },
-          ]}
-        />
-      </div>
+      
 
       <Card className="max-w-2xl">
         <CardHeader>

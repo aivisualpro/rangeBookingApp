@@ -7,16 +7,18 @@ import type { ColumnDef } from "@tanstack/react-table";
 import { Plus, Pencil, Trash2 } from "lucide-react";
 import { Button } from "@dashboardpack/core/components/ui/button";
 import { Badge } from "@dashboardpack/core/components/ui/badge";
-import { PageHeader } from "@dashboardpack/core/components/shared/page-header";
-import { DataTable, DataTableColumnHeader } from "@dashboardpack/core/components/shared/data-table";
+import { DataTable, DataTableColumnHeader } from "@/components/shared/data-table";
 import { ConfirmDialog } from "@dashboardpack/core/components/shared/confirm-dialog";
 import { toast } from "sonner";
+import { HeaderSearchPortal, HeaderActionsPortal } from "@/components/dashboard/header-portal";
+import { Input } from "@dashboardpack/core/components/ui/input";
 
 export default function CompaniesPage() {
   const router = useRouter();
   const [companies, setCompanies] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [globalFilter, setGlobalFilter] = useState("");
 
   const fetchCompanies = async () => {
     setIsLoading(true);
@@ -110,18 +112,26 @@ export default function CompaniesPage() {
 
   return (
     <>
-      <div className="mb-6">
-        <PageHeader title="Companies" description="Manage Range Companies and their settings." breadcrumbs={[{ label: "Dashboard", href: "/" }, { label: "Companies" }]}>
-          <Button onClick={() => router.push("/companies/new")} className="gap-2">
-            <Plus className="h-4 w-4" /> Add Company
-          </Button>
-        </PageHeader>
-      </div>
+      <HeaderSearchPortal>
+        <Input
+          placeholder="Search companies..."
+          value={globalFilter}
+          onChange={(e) => setGlobalFilter(e.target.value)}
+          className="h-9 w-full sm:w-64 bg-background"
+        />
+      </HeaderSearchPortal>
+
+      <HeaderActionsPortal>
+        <Button onClick={() => router.push("/companies/new")} size="sm" className="gap-1.5 h-9">
+          <Plus className="h-4 w-4" />
+          Add Company
+        </Button>
+      </HeaderActionsPortal>
 
       <DataTable
         columns={columns}
-        data={companies}
-        searchPlaceholder="Search companies..."
+        data={companies.filter(c => `${c.company_name} ${c.primary_contact_name} ${c.primary_contact_email}`.toLowerCase().includes(globalFilter.toLowerCase()))}
+        loading={isLoading}
         emptyMessage="No companies found."
       />
 

@@ -21,10 +21,12 @@ export async function POST(req: Request) {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const user = await User.create({
-      full_name: name,
+      first_name: name.split(" ")[0] || "",
+      last_name: name.split(" ").slice(1).join(" ") || "",
       email,
       password: hashedPassword,
       role: "admin",
+      status: "inactive",
     });
 
     return NextResponse.json({ success: true, userId: user._id });

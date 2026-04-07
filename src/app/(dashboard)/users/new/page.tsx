@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -28,192 +28,235 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
+  FormDescription,
 } from "@dashboardpack/core/components/ui/form";
-import { PageHeader } from "@dashboardpack/core/components/shared/page-header";
-import { Checkbox } from "@dashboardpack/core/components/ui/checkbox";
-import { createUser, allPermissions, departments } from "@dashboardpack/core/lib/data";
-import type { UserRole, UserStatus } from "@dashboardpack/core/lib/data";
+import { Switch } from "@dashboardpack/core/components/ui/switch";
 import { toast } from "sonner";
 
 const userSchema = z.object({
-  name: z.string().min(2, "Name must be at least 2 characters"),
+  user_type: z.enum(["Internal", "External"]),
+  first_name: z.string().min(1, "First name is required"),
+  last_name: z.string().min(1, "Last name is required"),
   email: z.string().email("Please enter a valid email address"),
-  role: z.enum(["admin", "editor", "viewer", "moderator"]),
-  department: z.string().min(1, "Please select a department"),
+  phone: z.string().optional(),
+  user_name: z.string().min(1, "User name is required"),
+  password: z.string().min(6, "Password must be at least 6 characters").optional().or(z.literal("")),
+  company_id: z.string().optional(),
   status: z.enum(["active", "inactive", "suspended"]),
-  permissions: z.array(z.string()),
+}).superRefine((data, ctx) => {
+  if (data.user_type === "External" && (!data.company_id || data.company_id === "none")) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "Company is required for External users",
+      path: ["company_id"],
+    });
+  }
 });
 
 type UserFormValues = z.infer<typeof userSchema>;
 
-function generateInitials(name: string): string {
-  return name
-    .split(" ")
-    .map((part) => part[0])
-    .join("")
-    .toUpperCase()
-    .slice(0, 2);
-}
-
 export default function NewUserPage() {
   const router = useRouter();
+  const [companies, setCompanies] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    // Attempt to fetch companies if the API exists
+    fetch("/api/companies")
+      .then(res => res.ok ? res.json() : { data: [] })
+      .then(json => {
+        if (json.data) setCompanies(json.data);
+      })
+      .catch(() => console.error("Could not fetch companies"));
+  }, []);
 
   const form = useForm<UserFormValues>({
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    resolver: zodResolver(userSchema) as any,
+    resolver: zodResolver(userSchema),
     defaultValues: {
-      name: "",
+      user_type: "External",
+      first_name: "",
+      last_name: "",
       email: "",
-      role: "viewer",
-      department: "",
+      phone: "",
+      user_name: "",
+      password: "",
+      company_id: "none",
       status: "active",
-      permissions: [],
     },
   });
 
-  function onSubmit(values: UserFormValues) {
-    createUser({
-      name: values.name,
-      email: values.email,
-      initials: generateInitials(values.name),
-      role: values.role as UserRole,
-      status: values.status as UserStatus,
-      department: values.department,
-      joinDate: new Date().toLocaleDateString("en-US", {
-        month: "short",
-        day: "numeric",
-        year: "numeric",
-      }),
-      lastActive: "Just now",
-      permissions: values.permissions,
-    });
+  const userType = form.watch("user_type");
 
-    toast.success("User created successfully!");
-    router.push("/users");
+  async function onSubmit(values: UserFormValues) {
+    setIsLoading(true);
+    try {
+      const res = await fetch("/api/users", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(values),
+      });
+
+      if (res.ok) {
+        toast.success("User created successfully!");
+        router.push("/users");
+      } else {
+        const err = await res.json();
+        toast.error(err.error || "Failed to create user");
+      }
+    } catch (e) {
+      toast.error("A server error occurred.");
+    } finally {
+      setIsLoading(false);
+    }
   }
 
-  // Group permissions by their group property
-  const permissionGroups = allPermissions.reduce(
-    (acc, perm) => {
-      if (!acc[perm.group]) {
-        acc[perm.group] = [];
-      }
-      acc[perm.group].push(perm);
-      return acc;
-    },
-    {} as Record<string, typeof allPermissions>
-  );
-
   return (
-    <>
-      <div className="mb-6">
-        <PageHeader
-          title="New User"
-          description="Add a new team member."
-          breadcrumbs={[
-            { label: "Dashboard", href: "/" },
-            { label: "Users", href: "/users" },
-            { label: "New User" },
-          ]}
-        />
-      </div>
-
-      <Card className="max-w-2xl">
+    <div className="flex justify-start mb-6">
+      <Card className="max-w-2xl w-full">
         <CardHeader>
           <CardTitle>User Details</CardTitle>
           <CardDescription>
-            Fill in the information below to create a new user.
+            Fill in the exact fields to provision a new user.
           </CardDescription>
         </CardHeader>
         <CardContent>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+              
               <FormField
                 control={form.control}
-                name="name"
+                name="user_type"
                 render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Name</FormLabel>
+                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                    <div className="space-y-0.5">
+                      <FormLabel className="text-base">Internal Access</FormLabel>
+                      <FormDescription className="text-sm text-muted-foreground">
+                        Toggle on if this is an internal administrative user.
+                      </FormDescription>
+                    </div>
                     <FormControl>
-                      <Input placeholder="e.g. Emma Wilson" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Email</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="email"
-                        placeholder="e.g. emma@example.com"
-                        {...field}
+                      <Switch
+                        checked={field.value === "Internal"}
+                        onCheckedChange={(checked) => field.onChange(checked ? "Internal" : "External")}
                       />
                     </FormControl>
+                  </FormItem>
+                )}
+              />
+
+              <div className="grid grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="first_name"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>First Name</FormLabel>
+                      <FormControl>
+                        <Input placeholder="e.g. Emma" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <FormField
+                  control={form.control}
+                  name="last_name"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Last Name</FormLabel>
+                      <FormControl>
+                        <Input placeholder="e.g. Wilson" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <FormField
+                control={form.control}
+                name="user_name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>User Name</FormLabel>
+                    <FormControl>
+                      <Input placeholder="e.g. emma_w" {...field} />
+                    </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
 
+              <div className="grid grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Email</FormLabel>
+                      <FormControl>
+                        <Input type="email" placeholder="e.g. emma@example.com" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="phone"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Phone</FormLabel>
+                      <FormControl>
+                        <Input placeholder="e.g. (555) 123-4567" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
               <FormField
                 control={form.control}
-                name="role"
+                name="password"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Role</FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
-                      <FormControl>
-                        <SelectTrigger className="w-full">
-                          <SelectValue placeholder="Select role" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="admin">Admin</SelectItem>
-                        <SelectItem value="editor">Editor</SelectItem>
-                        <SelectItem value="viewer">Viewer</SelectItem>
-                        <SelectItem value="moderator">Moderator</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <FormLabel>Password</FormLabel>
+                    <FormControl>
+                      <Input type="password" placeholder="Create a secure password" {...field} />
+                    </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
 
-              <FormField
-                control={form.control}
-                name="department"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Department</FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
-                      <FormControl>
-                        <SelectTrigger className="w-full">
-                          <SelectValue placeholder="Select department" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {departments.map((dept) => (
-                          <SelectItem key={dept} value={dept}>
-                            {dept}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              {userType === "External" && (
+                <FormField
+                  control={form.control}
+                  name="company_id"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Company Association</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select a company" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="none">--- Select Company ---</SelectItem>
+                          {companies.map(c => (
+                            <SelectItem key={c._id || c.id} value={c._id || c.id}>{c.name}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
 
               <FormField
                 control={form.control}
@@ -221,10 +264,7 @@ export default function NewUserPage() {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Status</FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
                         <SelectTrigger className="w-full">
                           <SelectValue placeholder="Select status" />
@@ -241,70 +281,9 @@ export default function NewUserPage() {
                 )}
               />
 
-              <FormField
-                control={form.control}
-                name="permissions"
-                render={() => (
-                  <FormItem>
-                    <FormLabel>Permissions</FormLabel>
-                    <div className="grid gap-4 sm:grid-cols-2">
-                      {Object.entries(permissionGroups).map(
-                        ([group, perms]) => (
-                          <div key={group} className="space-y-2">
-                            <p className="text-sm font-medium text-muted-foreground">
-                              {group}
-                            </p>
-                            {perms.map((perm) => (
-                              <FormField
-                                key={perm.key}
-                                control={form.control}
-                                name="permissions"
-                                render={({ field }) => (
-                                  <FormItem className="flex items-center gap-2 space-y-0">
-                                    <FormControl>
-                                      <Checkbox
-                                        checked={field.value?.includes(
-                                          perm.key
-                                        )}
-                                        onCheckedChange={(checked) => {
-                                          if (checked) {
-                                            field.onChange([
-                                              ...field.value,
-                                              perm.key,
-                                            ]);
-                                          } else {
-                                            field.onChange(
-                                              field.value?.filter(
-                                                (v: string) => v !== perm.key
-                                              )
-                                            );
-                                          }
-                                        }}
-                                      />
-                                    </FormControl>
-                                    <FormLabel className="text-sm font-normal cursor-pointer">
-                                      {perm.label}
-                                    </FormLabel>
-                                  </FormItem>
-                                )}
-                              />
-                            ))}
-                          </div>
-                        )
-                      )}
-                    </div>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
               <div className="flex items-center gap-3 pt-2">
-                <Button type="submit">Create User</Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => router.push("/users")}
-                >
+                <Button type="submit" disabled={isLoading}>{isLoading ? "Saving..." : "Create User"}</Button>
+                <Button type="button" variant="outline" onClick={() => router.push("/users")}>
                   Cancel
                 </Button>
               </div>
@@ -312,6 +291,6 @@ export default function NewUserPage() {
           </Form>
         </CardContent>
       </Card>
-    </>
+    </div>
   );
 }

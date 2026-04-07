@@ -5,7 +5,6 @@ import React, { useState, useEffect, use } from "react";
 import { useRouter } from "next/navigation";
 import { Input } from "@dashboardpack/core/components/ui/input";
 import { Button } from "@dashboardpack/core/components/ui/button";
-import { PageHeader } from "@dashboardpack/core/components/shared/page-header";
 import { Switch } from "@dashboardpack/core/components/ui/switch";
 import { toast } from "sonner";
 
@@ -56,9 +55,7 @@ export default function EditCompanyPage({ params }: { params: Promise<{ id: stri
 
   return (
     <div className="max-w-2xl">
-      <div className="mb-6">
-        <PageHeader title="Edit Company" description="Update Range Company internal settings." breadcrumbs={[{ label: "Dashboard", href: "/" }, { label: "Companies", href: "/companies" }, { label: "Edit" }]} />
-      </div>
+      
 
       <form onSubmit={handleSubmit} className="space-y-6 rounded-lg border bg-card p-6 shadow-sm">
         <div className="space-y-4">

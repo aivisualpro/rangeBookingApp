@@ -5,7 +5,7 @@ import Link from "next/link";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { Github } from "lucide-react";
+
 import { Button } from "@dashboardpack/core/components/ui/button";
 import { Input } from "@dashboardpack/core/components/ui/input";
 import { Label } from "@dashboardpack/core/components/ui/label";
@@ -136,7 +136,7 @@ export default function RegisterPage() {
             </span>
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 gap-3">
             <Button variant="outline" type="button" onClick={() => signIn("google", { callbackUrl: "/dashboard" })}>
               <svg
                 className="size-4"
@@ -163,10 +163,7 @@ export default function RegisterPage() {
               </svg>
               Google
             </Button>
-            <Button variant="outline" type="button">
-              <Github className="size-4" />
-              GitHub
-            </Button>
+
           </div>
 
           <p className="mt-6 text-center text-sm text-muted-foreground">

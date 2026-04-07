@@ -13,7 +13,6 @@ import {
   CardDescription,
 } from "@dashboardpack/core/components/ui/card";
 import { Separator } from "@dashboardpack/core/components/ui/separator";
-import { PageHeader } from "@dashboardpack/core/components/shared/page-header";
 import { ConfirmDialog } from "@dashboardpack/core/components/shared/confirm-dialog";
 import { getUserById, deleteUser, allPermissions } from "@dashboardpack/core/lib/data";
 import type { UserRole, UserStatus } from "@dashboardpack/core/lib/data";
@@ -62,32 +61,7 @@ export default function UserDetail({
   return (
     <>
       <div className="mb-6">
-        <PageHeader
-          title={user.name}
-          description={user.email}
-          breadcrumbs={[
-            { label: "Dashboard", href: "/" },
-            { label: "Users", href: "/users" },
-            { label: user.name },
-          ]}
-        >
-          <Button
-            variant="outline"
-            className="gap-1.5"
-            onClick={() => router.push(`/users/${user.id}/edit`)}
-          >
-            <Pencil className="h-4 w-4" />
-            Edit
-          </Button>
-          <Button
-            variant="destructive"
-            className="gap-1.5"
-            onClick={() => setShowDeleteDialog(true)}
-          >
-            <Trash2 className="h-4 w-4" />
-            Delete
-          </Button>
-        </PageHeader>
+        <div className="flex justify-end mb-6"></div>
       </div>
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">

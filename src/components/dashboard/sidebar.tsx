@@ -3,11 +3,13 @@
 import React, { useState, useCallback } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { signOut, useSession } from "next-auth/react";
 import { cn } from "@dashboardpack/core/lib/utils";
 import { useSidebar } from "@dashboardpack/core/providers/sidebar-context";
 import { useTranslations } from "@dashboardpack/core/lib/i18n/locale-context";
 import type { TranslationKey } from "@dashboardpack/core/lib/i18n/locale-context";
 import {
+  Search,
   LayoutDashboard,
   BarChart3,
   Server,
@@ -71,10 +73,6 @@ export const navGroups: NavGroup[] = [
     label: "Infrastructure",
     items: [
       { icon: Server, label: "Servers", href: "/servers" },
-      { icon: Container, label: "Containers", href: "/containers" },
-      { icon: Layers, label: "Kubernetes", href: "/kubernetes" },
-      { icon: Database, label: "Databases", href: "/databases" },
-      { icon: Activity, label: "Uptime", href: "/uptime" },
       { icon: Globe, label: "Status Page", href: "/status" },
     ],
   },
@@ -82,12 +80,7 @@ export const navGroups: NavGroup[] = [
     label: "Operations",
     items: [
       { icon: Rocket, label: "Deployments", href: "/deployments", badge: "3" },
-      { icon: GitBranch, label: "Pipelines", href: "/pipelines" },
-      { icon: AlertTriangle, label: "Incidents", href: "/incidents", badge: "2" },
       { icon: ScrollText, label: "Logs", href: "/logs" },
-      { icon: Radar, label: "API Monitoring", href: "/api-monitoring" },
-      { icon: Shield, label: "Security", href: "/security" },
-      { icon: DollarSign, label: "Cloud Costs", href: "/costs" },
     ],
   },
   {
@@ -103,7 +96,7 @@ export const navGroups: NavGroup[] = [
 ];
 
 export const systemNav: NavGroup = {
-  label: "System",
+  label: "Administration",
   tKey: "sidebar.system",
   items: [
     { icon: UserCog, label: "Users", href: "/users", tKey: "sidebar.users" },
@@ -115,12 +108,7 @@ export const systemNav: NavGroup = {
   ],
 };
 
-export const docsNav: NavItem = {
-  icon: BookOpen,
-  label: "Documentation",
-  href: "/docs",
-  tKey: "sidebar.documentation",
-};
+
 
 function NavItemComponent({
   item,
@@ -245,6 +233,7 @@ function CollapsibleGroup({
 
 function SidebarContent({ collapsed }: { collapsed: boolean }) {
   const pathname = usePathname();
+  const { data: session } = useSession();
 
   const isActive = (href: string) =>
     pathname === href || (href !== "/dashboard" && pathname.startsWith(href + "/"));
@@ -266,6 +255,26 @@ function SidebarContent({ collapsed }: { collapsed: boolean }) {
               Dashboard
             </span>
           </div>
+        )}
+      </div>
+
+      <div className="px-3 pb-2 pt-4 border-b border-sidebar-border mb-2">
+        {!collapsed ? (
+          <button
+            onClick={() => document.dispatchEvent(new KeyboardEvent("keydown", { key: "k", metaKey: true }))}
+            className="flex h-9 w-full items-center rounded-lg border border-input bg-sidebar-accent/50 ps-3 pe-2 text-start text-sm text-sidebar-foreground/70 transition-colors hover:bg-sidebar-accent"
+          >
+            <Search className="h-4 w-4 mr-2 opacity-50" />
+            <span className="flex-1 opacity-70">Search...</span>
+            <kbd className="pointer-events-none rounded border border-border bg-sidebar px-1.5 text-[10px] font-medium opacity-50">⌘K</kbd>
+          </button>
+        ) : (
+          <button
+            onClick={() => document.dispatchEvent(new KeyboardEvent("keydown", { key: "k", metaKey: true }))}
+            className="flex h-9 w-9 items-center justify-center rounded-lg hover:bg-sidebar-accent mx-auto text-sidebar-foreground/50 transition-colors hover:text-sidebar-foreground"
+          >
+            <Search className="h-4 w-4" />
+          </button>
         )}
       </div>
 
@@ -294,13 +303,7 @@ function SidebarContent({ collapsed }: { collapsed: boolean }) {
           defaultOpen={true}
         />
 
-        <div className="my-2 border-t border-sidebar-border" />
 
-        <NavItemComponent
-          item={docsNav}
-          collapsed={collapsed}
-          active={isActive(docsNav.href)}
-        />
       </nav>
 
       {/* User section */}
@@ -317,18 +320,19 @@ function SidebarContent({ collapsed }: { collapsed: boolean }) {
               AS
             </div>
             {!collapsed && (
-              <div className="flex flex-1 flex-col">
-                <span className="text-sm font-medium text-sidebar-foreground">
-                  Aigars S.
+              <div className="flex flex-1 flex-col truncate">
+                <span className="text-sm font-medium text-sidebar-foreground truncate">
+                  {session?.user?.name || "Admin User"}
                 </span>
-                <span className="text-[11px] text-sidebar-foreground/50">
-                  Admin
+                <span className="text-[11px] text-sidebar-foreground/50 truncate">
+                  {session?.user?.email || "admin@example.com"}
                 </span>
               </div>
             )}
           </Link>
           {!collapsed && (
             <button
+              onClick={() => signOut({ callbackUrl: '/login' })}
               aria-label="Log out"
               className="rounded-md p-1.5 text-sidebar-foreground/40 transition-colors hover:bg-sidebar-accent hover:text-sidebar-foreground/70"
             >

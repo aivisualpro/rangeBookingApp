@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { useTheme } from "@dashboardpack/core/providers/theme-provider";
 import { useSidebar } from "@dashboardpack/core/providers/sidebar-context";
 import { ThemeCustomizer } from "./theme-customizer";
@@ -63,6 +63,7 @@ export function Header() {
   const { theme, setTheme } = useTheme();
   const { setMobileOpen, layout } = useSidebar();
   const router = useRouter();
+  const pathname = usePathname();
   const t = useTranslations();
   const [notifOpen, setNotifOpen] = useState(false);
   const [customizerOpen, setCustomizerOpen] = useState(false);
@@ -71,6 +72,25 @@ export function Header() {
 
   const unreadCount = getUnreadCount();
   const recentNotifications = getNotifications().slice(0, 5);
+
+  const getRouteTitle = () => {
+    if (!pathname || pathname === "/" || pathname === "/dashboard") return "Dashboard";
+    const segments = pathname.split("/").filter(Boolean);
+    const mainSegment = segments[0];
+    if (!mainSegment) return "Dashboard";
+    
+    let title = mainSegment.replace(/-/g, " ");
+    
+    if (segments.length > 1) {
+      if (segments[segments.length - 1] === "new") {
+        title = "New " + title.replace(/s$/, ""); 
+      } else if (segments[segments.length - 1] === "edit") {
+        title = "Edit " + title.replace(/s$/, "");
+      }
+    }
+    
+    return title.split(" ").map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
+  };
 
   return (
     <div className="sticky top-0 z-30">
@@ -90,37 +110,20 @@ export function Header() {
             <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary">
               <Terminal className="h-4 w-4 text-primary-foreground" />
             </div>
-            <span className="text-sm font-bold tracking-tight">Range Booking App</span>
             <div className="mx-1 h-6 w-px bg-border" />
           </div>
         )}
 
-        <button
-          onClick={() => document.dispatchEvent(new KeyboardEvent("keydown", { key: "k", metaKey: true }))}
-          className="relative hidden h-9 w-72 items-center rounded-lg border border-input bg-muted/40 ps-9 pe-4 text-start text-sm text-muted-foreground/50 transition-colors hover:bg-muted/60 sm:flex"
-        >
-          <Search className="absolute ltr:left-3 rtl:right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground/60" />
-          {t("header.search")}
-          <kbd className="pointer-events-none absolute ltr:right-3 rtl:left-3 top-1/2 -translate-y-1/2 rounded border border-border bg-muted px-1.5 text-[10px] font-medium text-muted-foreground">
-            ⌘K
-          </kbd>
-        </button>
+        {/* Dynamic Route Title for all layouts */}
+        <div className="flex items-center gap-2.5 ms-2">
+           <span className="text-xl font-bold tracking-tight text-foreground">{getRouteTitle()}</span>
+           <div id="route-header-search" className="ml-4 hidden sm:flex items-center shrink-0 w-64 w-full"></div>
+        </div>
       </div>
 
       {/* Right: Actions */}
       <div className="flex items-center gap-2">
-        {/* New Deployment */}
-        <Button
-          variant="default"
-          size="sm"
-          className="hidden gap-1.5 h-8 text-xs sm:inline-flex"
-          onClick={() => router.push("/deployments")}
-        >
-          <Plus className="h-3.5 w-3.5" />
-          New Deploy
-        </Button>
-
-        <div className="mx-1 hidden h-6 w-px bg-border sm:block" />
+        <div id="route-header-actions" className="flex items-center shrink-0 mr-2"></div>
 
         {/* Theme toggle */}
         <button

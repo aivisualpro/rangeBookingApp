@@ -16,7 +16,6 @@ import {
 import { toast } from "sonner";
 
 import { cn } from "@dashboardpack/core/lib/utils";
-import { PageHeader } from "@dashboardpack/core/components/shared/page-header";
 import { Button } from "@dashboardpack/core/components/ui/button";
 import { Badge } from "@dashboardpack/core/components/ui/badge";
 import { Card } from "@dashboardpack/core/components/ui/card";
@@ -186,25 +185,7 @@ export default function KanbanPage() {
     <>
       {/* Header */}
       <div className="mb-6">
-        <PageHeader
-          title="Kanban Board"
-          description="Organize and track project tasks"
-          breadcrumbs={[
-            { label: "Dashboard", href: "/" },
-            { label: "Kanban Board" },
-          ]}
-        >
-          <Button
-            onClick={() => {
-              setForm(emptyForm);
-              setDialogOpen(true);
-            }}
-            className="gap-1.5"
-          >
-            <Plus className="h-4 w-4" />
-            New Task
-          </Button>
-        </PageHeader>
+        <div className="flex justify-end mb-6"></div>
       </div>
 
       {/* Board */}

@@ -10,7 +10,6 @@ import { Input } from "@dashboardpack/core/components/ui/input";
 import { Progress } from "@dashboardpack/core/components/ui/progress";
 import { Separator } from "@dashboardpack/core/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@dashboardpack/core/components/ui/tabs";
-import { PageHeader } from "@dashboardpack/core/components/shared/page-header";
 import { cn } from "@dashboardpack/core/lib/utils";
 import { toast } from "sonner";
 import {
@@ -459,16 +458,7 @@ export default function ProfilePage() {
 
   return (
     <>
-      <div className="mb-6">
-        <PageHeader
-          title="Profile"
-          description="View and manage your profile information."
-          breadcrumbs={[
-            { label: "Dashboard", href: "/" },
-            { label: "Profile" },
-          ]}
-        />
-      </div>
+      
 
       {/* Banner / Hero */}
       <Card className="mb-6 overflow-hidden">

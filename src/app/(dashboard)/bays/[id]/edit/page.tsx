@@ -4,7 +4,6 @@ import React, { useState, useEffect, use } from "react";
 import { useRouter } from "next/navigation";
 import { Input } from "@dashboardpack/core/components/ui/input";
 import { Button } from "@dashboardpack/core/components/ui/button";
-import { PageHeader } from "@dashboardpack/core/components/shared/page-header";
 import { Switch } from "@dashboardpack/core/components/ui/switch";
 import { toast } from "sonner";
 import { Textarea } from "@dashboardpack/core/components/ui/textarea";
@@ -50,9 +49,7 @@ export default function EditBayPage({ params }: { params: Promise<{ id: string }
 
   return (
     <div className="max-w-3xl">
-      <div className="mb-6">
-        <PageHeader title="Edit Bay" description="Update details and pricing for this bay." breadcrumbs={[{ label: "Dashboard", href: "/" }, { label: "Bays", href: "/bays" }, { label: "Edit" }]} />
-      </div>
+      
 
       <form onSubmit={handleSubmit} className="space-y-6 rounded-lg border bg-card p-6 shadow-sm">
         <div className="space-y-4">

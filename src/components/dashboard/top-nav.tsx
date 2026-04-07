@@ -4,7 +4,7 @@ import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@dashboardpack/core/lib/utils";
-import { navGroups, systemNav, docsNav } from "./sidebar";
+import { navGroups, systemNav } from "./sidebar";
 import { ChevronDown } from "lucide-react";
 import {
   DropdownMenu,
@@ -117,19 +117,6 @@ export function TopNav() {
             })}
           </DropdownMenuContent>
         </DropdownMenu>
-
-        {/* Docs link */}
-        <Link
-          href={docsNav.href}
-          className={cn(
-            "flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium transition-colors",
-            isActive(docsNav.href)
-              ? "text-primary"
-              : "text-muted-foreground hover:text-foreground hover:bg-accent"
-          )}
-        >
-          {docsNav.label}
-        </Link>
       </div>
     </nav>
   );

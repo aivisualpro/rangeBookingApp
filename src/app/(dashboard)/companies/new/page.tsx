@@ -5,7 +5,6 @@ import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Input } from "@dashboardpack/core/components/ui/input";
 import { Button } from "@dashboardpack/core/components/ui/button";
-import { PageHeader } from "@dashboardpack/core/components/shared/page-header";
 import { Switch } from "@dashboardpack/core/components/ui/switch";
 import { toast } from "sonner";
 
@@ -44,9 +43,7 @@ export default function NewCompanyPage() {
 
   return (
     <div className="max-w-2xl">
-      <div className="mb-6">
-        <PageHeader title="New Company" description="Create a new Range Company and add their default admin user." breadcrumbs={[{ label: "Dashboard", href: "/" }, { label: "Companies", href: "/companies" }, { label: "New" }]} />
-      </div>
+      
 
       <form onSubmit={handleSubmit} className="space-y-6 rounded-lg border bg-card p-6 shadow-sm">
         <div className="space-y-4">

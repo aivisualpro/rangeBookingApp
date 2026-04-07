@@ -47,44 +47,7 @@ export default function SupportPage() {
         </p>
       </div>
 
-      {/* Status + Quick Links */}
-      <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
-        <Card>
-          <CardContent className="flex items-center gap-3 p-5">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-success/10">
-              <CheckCircle className="h-5 w-5 text-success" />
-            </div>
-            <div>
-              <p className="text-sm font-medium">System Status</p>
-              <p className="text-xs text-success">All systems operational</p>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <Link href="/docs">
-            <CardContent className="flex items-center gap-3 p-5 transition-colors hover:bg-muted/30">
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-chart-1/10">
-                <FileText className="h-5 w-5 text-chart-1" />
-              </div>
-              <div>
-                <p className="text-sm font-medium">Documentation</p>
-                <p className="text-xs text-muted-foreground">Browse guides and API docs</p>
-              </div>
-            </CardContent>
-          </Link>
-        </Card>
-        <Card>
-          <CardContent className="flex items-center gap-3 p-5">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-chart-3/10">
-              <MessageSquare className="h-5 w-5 text-chart-3" />
-            </div>
-            <div>
-              <p className="text-sm font-medium">Live Chat</p>
-              <Badge variant="secondary" className="mt-0.5 text-[10px]">Coming soon</Badge>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+
 
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
         {/* FAQ */}

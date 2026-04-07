@@ -4,7 +4,6 @@ import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Input } from "@dashboardpack/core/components/ui/input";
 import { Button } from "@dashboardpack/core/components/ui/button";
-import { PageHeader } from "@dashboardpack/core/components/shared/page-header";
 import { Switch } from "@dashboardpack/core/components/ui/switch";
 import { toast } from "sonner";
 import { Textarea } from "@dashboardpack/core/components/ui/textarea";
@@ -49,9 +48,7 @@ export default function NewBayPage() {
 
   return (
     <div className="max-w-3xl">
-      <div className="mb-6">
-        <PageHeader title="New Bay" description="Add a new shooting bay to your facility." breadcrumbs={[{ label: "Dashboard", href: "/" }, { label: "Bays", href: "/bays" }, { label: "New" }]} />
-      </div>
+      
 
       <form onSubmit={handleSubmit} className="space-y-6 rounded-lg border bg-card p-6 shadow-sm">
         <div className="space-y-4">

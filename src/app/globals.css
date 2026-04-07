@@ -167,14 +167,14 @@
 }
 
 /* Fonts */
-.font-inter {
-  --font-sans: var(--font-inter);
-  --font-mono: var(--font-jetbrains-mono);
+html.font-inter, html.font-inter body {
+  font-family: var(--font-inter), sans-serif !important;
+  --font-sans: var(--font-inter) !important;
 }
 
-.font-jetbrains {
-  --font-sans: var(--font-jetbrains-mono);
-  --font-mono: var(--font-jetbrains-mono);
+html.font-jetbrains, html.font-jetbrains body {
+  font-family: var(--font-jetbrains-mono), monospace !important;
+  --font-sans: var(--font-jetbrains-mono) !important;
 }
 
 /* Refined scrollbar */

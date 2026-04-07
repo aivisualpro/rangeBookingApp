@@ -210,7 +210,7 @@ export default function UsersPage() {
   );
 
   return (
-    <div className="flex flex-col h-[calc(100vh-4rem)]">
+    <div className="flex flex-col flex-1 min-h-0">
       <HeaderSearchPortal>
         <Input
           placeholder="Search users..."
@@ -227,7 +227,7 @@ export default function UsersPage() {
         </Button>
       </HeaderActionsPortal>
 
-      <div className="flex-1 min-h-0 overflow-auto">
+      <div className="flex-1 min-h-0 flex flex-col">
         <DataTable
           columns={columns}
           data={filteredData}

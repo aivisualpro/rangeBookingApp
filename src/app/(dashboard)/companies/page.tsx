@@ -67,10 +67,14 @@ export default function CompaniesPage() {
           </div>
           <div>
             <p className="text-sm font-medium">{row.original.company_name}</p>
-            <p className="text-xs text-muted-foreground">{row.original.primary_contact_email}</p>
           </div>
         </div>
       )
+    },
+    {
+      accessorKey: "primary_contact_email",
+      header: ({ column }) => <DataTableColumnHeader column={column} title="Email" />,
+      cell: ({ row }) => <span className="text-sm text-muted-foreground">{row.original.primary_contact_email?.toLowerCase() || '—'}</span>
     },
     {
       accessorKey: "primary_contact_name",

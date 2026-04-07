@@ -13,26 +13,26 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
   return (
     <div
       className={cn(
-        "min-h-screen",
+        "h-screen overflow-hidden",
         container === "boxed"
           ? "mx-auto max-w-[1440px] border-x border-border bg-background shadow-sm"
           : "bg-background"
       )}
     >
-      <div className="flex min-h-screen">
+      <div className="flex h-full overflow-hidden">
         <Sidebar />
         <CommandPalette />
 
         <div
           className={cn(
-            "flex flex-1 flex-col transition-all duration-300",
+            "flex flex-1 flex-col overflow-hidden",
             layout === "sidebar"
               ? collapsed ? "lg:ms-[68px]" : "lg:ms-[260px]"
               : ""
           )}
         >
           <Header />
-          <main id="main-content" className="flex-1 p-4 sm:p-6">
+          <main id="main-content" className="flex-1 flex flex-col min-h-0 overflow-hidden p-4 sm:p-6">
             <PageTransition>{children}</PageTransition>
           </main>
         </div>

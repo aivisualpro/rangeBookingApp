@@ -1,6 +1,11 @@
 @import "tailwindcss";
 @source "../../node_modules/@dashboardpack/core";
 
+html, body {
+  height: 100vh;
+  overflow: hidden;
+}
+
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {

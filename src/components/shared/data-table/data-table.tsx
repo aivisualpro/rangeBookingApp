@@ -77,7 +77,7 @@ export function DataTable<TData, TValue>({
   const [globalFilter, setGlobalFilter] = useState("");
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
-    pageSize: perPageOptions?.[0] ?? 10,
+    pageSize: perPageOptions?.[0] ?? 20,
   });
 
   const table = useReactTable({
@@ -108,8 +108,8 @@ export function DataTable<TData, TValue>({
   });
 
   return (
-    <div className="flex flex-col h-full">
-      {/* Toolbar */}
+    <div className="flex flex-col flex-1 min-h-0">
+      {/* Toolbar (portaled, takes no height) */}
       <DataTableToolbar
         table={table}
         searchPlaceholder={searchPlaceholder}
@@ -118,33 +118,31 @@ export function DataTable<TData, TValue>({
         bulkActions={bulkActions}
       />
 
-      {/* Desktop Table — scrollable */}
-      <div className="hidden md:flex flex-col flex-1 min-h-0">
-        <div className="flex-1 overflow-auto rounded-md border">
-          <Table>
-            <TableHeader className="sticky top-0 z-10 bg-background">
-              {table.getHeaderGroups().map((headerGroup) => (
-                <TableRow key={headerGroup.id}>
-                  {headerGroup.headers.map((header) => (
-                    <TableHead
-                      key={header.id}
-                      className={header.column.columnDef.meta?.className}
-                      style={{ width: header.getSize() !== 150 ? header.getSize() : undefined }}
-                    >
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
-                    </TableHead>
-                  ))}
-                </TableRow>
-              ))}
-            </TableHeader>
+      {/* Desktop Table */}
+      <div className="hidden md:flex flex-col flex-1 min-h-0 rounded-md border bg-background overflow-hidden relative">
+        <Table className="[&_th]:sticky [&_th]:top-0 [&_th]:z-20 [&_th]:bg-background/95 [&_th]:backdrop-blur [&_th]:shadow-[inset_0_-1px_0_hsl(var(--border))]">
+          <TableHeader>
+            {table.getHeaderGroups().map((headerGroup) => (
+              <TableRow key={headerGroup.id}>
+                {headerGroup.headers.map((header) => (
+                  <TableHead
+                    key={header.id}
+                    className={header.column.columnDef.meta?.className}
+                    style={{ width: header.getSize() !== 150 ? header.getSize() : undefined }}
+                  >
+                    {header.isPlaceholder
+                      ? null
+                      : flexRender(
+                          header.column.columnDef.header,
+                          header.getContext()
+                        )}
+                  </TableHead>
+                ))}
+              </TableRow>
+            ))}
+          </TableHeader>
             <TableBody>
               {loading ? (
-                // Skeleton loading rows
                 Array.from({ length: 5 }).map((_, i) => (
                   <TableRow key={`skeleton-${i}`}>
                     {columns.map((_, j) => (
@@ -189,7 +187,6 @@ export function DataTable<TData, TValue>({
               )}
             </TableBody>
           </Table>
-        </div>
       </div>
 
       {/* Mobile Card View */}
@@ -199,9 +196,9 @@ export function DataTable<TData, TValue>({
         emptyMessage={emptyMessage}
       />
 
-      {/* Pagination — fixed at bottom */}
-      <div className="pt-2">
-        <DataTablePagination table={table} perPageOptions={perPageOptions} />
+      {/* Pagination — always at bottom */}
+      <div className="shrink-0 border-t pt-2">
+        <DataTablePagination table={table} />
       </div>
     </div>
   );

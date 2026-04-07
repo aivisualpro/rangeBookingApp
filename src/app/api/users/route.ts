@@ -23,7 +23,7 @@ export async function GET() {
         company_name: company?.company_name || "",
         role: u.role || "member",
         status: u.status || "inactive",
-        lastActive: "Recently",
+        lastActive: u.last_active ? u.last_active.toISOString() : null,
         initials: fullName.substring(0, 2).toUpperCase(),
       };
     });

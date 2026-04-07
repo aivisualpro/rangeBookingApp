@@ -12,6 +12,7 @@ export interface IUser extends Document {
   password?: string;
   role: string;
   status: string;
+  last_active?: Date;
 }
 
 const UserSchema = new Schema(
@@ -26,6 +27,7 @@ const UserSchema = new Schema(
     password: { type: String, required: false },
     role: { type: String, default: "member" },
     status: { type: String, default: "inactive" },
+    last_active: { type: Date },
   },
   { timestamps: true }
 );

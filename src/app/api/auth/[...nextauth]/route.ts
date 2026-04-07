@@ -58,6 +58,13 @@ export const authOptions: NextAuthOptions = {
         }
         user.id = dbUser._id.toString();
       }
+      if (user.id) {
+        await connectToDatabase();
+        await User.updateOne(
+          { _id: user.id },
+          { $set: { last_active: new Date() } }
+        );
+      }
       return true;
     },
     async jwt({ token, user }) {

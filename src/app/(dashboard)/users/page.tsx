@@ -150,11 +150,13 @@ export default function UsersPage() {
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title="Last Active" />
       ),
-      cell: ({ row }) => (
-        <span className="text-sm text-muted-foreground">
-          {row.original.lastActive}
-        </span>
-      ),
+      cell: ({ row }) => {
+        const val = row.original.lastActive;
+        const display = val ? new Date(val).toLocaleString() : "Never";
+        return (
+          <span className="text-sm text-muted-foreground">{display}</span>
+        );
+      },
     },
     {
       id: "actions",

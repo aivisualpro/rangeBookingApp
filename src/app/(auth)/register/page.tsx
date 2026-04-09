@@ -21,7 +21,7 @@ import {
 } from "@dashboardpack/core/components/ui/card";
 import { Textarea } from "@dashboardpack/core/components/ui/textarea";
 
-export const formatPhoneNumber = (value: string) => {
+const formatPhoneNumber = (value: string) => {
   if (!value) return value;
   const phoneNumber = value.replace(/[^\d]/g, "");
   if (phoneNumber.length < 4) return phoneNumber;

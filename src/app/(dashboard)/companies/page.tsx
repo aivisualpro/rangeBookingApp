@@ -260,7 +260,7 @@ export default function CompaniesPage() {
           <div className="flex flex-col items-center space-y-6 pt-4">
             <div className="bg-white p-3 rounded-xl border shadow-sm">
               <img 
-                src={shareCompany?.signup_url ? `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(shareCompany.signup_url)}` : ""} 
+                src={shareCompany?.signup_url ? `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(shareCompany.signup_url)}` : undefined} 
                 alt="QR Code" 
                 className="w-48 h-48"
               />

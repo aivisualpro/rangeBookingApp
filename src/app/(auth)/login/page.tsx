@@ -4,7 +4,7 @@ import { toast } from "sonner";
 import Link from "next/link";
 import { signIn } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import Script from "next/script";
 
 import { Button } from "@dashboardpack/core/components/ui/button";
@@ -20,7 +20,7 @@ import {
   CardTitle,
 } from "@dashboardpack/core/components/ui/card";
 
-export default function LoginPage() {
+function LoginForm() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -148,5 +148,13 @@ export default function LoginPage() {
         </CardContent>
       </Card>
     </>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div className="flex h-screen items-center justify-center">Loading...</div>}>
+      <LoginForm />
+    </Suspense>
   );
 }

@@ -87,7 +87,7 @@ export const navGroups: NavGroup[] = [
     label: "Tools",
     items: [
       { icon: Kanban, label: "Task Board", href: "/kanban" },
-      { icon: Calendar, label: "On-Call Schedule", href: "/calendar" },
+      { icon: Calendar, label: "Bookings", href: "/bookings" },
       { icon: ListChecks, label: "Setup Wizard", href: "/wizard" },
       { icon: CreditCard, label: "Cloud Billing", href: "/billing" },
       { icon: FileText, label: "Invoices", href: "/invoices" },

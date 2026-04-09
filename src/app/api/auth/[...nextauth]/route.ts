@@ -87,7 +87,10 @@ const authOptions: NextAuthOptions = {
       return session;
     },
   },
-  session: { strategy: "jwt" },
+  session: { 
+    strategy: "jwt",
+    maxAge: 30 * 24 * 60 * 60, // 30 days Persistent Login
+  },
   secret: process.env.NEXTAUTH_SECRET,
   pages: {
     signIn: "/login",

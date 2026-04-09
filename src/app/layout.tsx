@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
 import { Inter } from "next/font/google";
 import { ThemeProvider } from "@dashboardpack/core/providers/theme-provider";
@@ -25,8 +25,21 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: "Range Booking App",
-  description:
-    "A terminal-inspired DevOps dashboard built with Next.js, shadcn/ui, and Tailwind CSS v4. Monitor servers, deployments, incidents, and infrastructure in real-time.",
+  description: "Schedule and manage range bookings securely in real-time.",
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "RangeBooking",
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#0d9488",
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
 };
 
 export default function RootLayout({

@@ -1,0 +1,16 @@
+{
+  "name": "Range Booking App",
+  "short_name": "RangeBooking",
+  "description": "Schedule and manage range bookings securely.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#0d9488",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "any",
+      "type": "image/x-icon"
+    }
+  ]
+}

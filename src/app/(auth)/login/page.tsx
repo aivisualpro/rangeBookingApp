@@ -71,7 +71,7 @@ function LoginForm() {
     } else {
       setSuccessAnim(true);
       setTimeout(() => {
-        router.push("/dashboard");
+        router.push("/profile");
       }, 2000);
     }
   }

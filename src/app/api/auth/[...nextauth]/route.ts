@@ -39,7 +39,15 @@ const authOptions: NextAuthOptions = {
         const isMatch = await bcrypt.compare(credentials.password, user.password);
         if (!isMatch) throw new Error("Incorrect password");
 
-        return { id: user._id.toString(), email: user.email, name: `${user.first_name || ""} ${user.last_name || ""}`.trim() || "User" };
+        return { 
+          id: user._id.toString(), 
+          email: user.email, 
+          name: `${user.first_name || ""} ${user.last_name || ""}`.trim() || "User",
+          phone: user.phone || "",
+          role: user.role || "member",
+          userType: user.user_type || "External",
+          companyName: user.company_id?.company_name || ""
+        };
       },
     }),
   ],
@@ -61,12 +69,20 @@ const authOptions: NextAuthOptions = {
     async jwt({ token, user }) {
       if (user) {
         token.sub = user.id;
+        token.phone = (user as any).phone;
+        token.role = (user as any).role;
+        token.userType = (user as any).userType;
+        token.companyName = (user as any).companyName;
       }
       return token;
     },
     async session({ session, token }) {
       if (session.user) {
         (session.user as any).id = token.sub;
+        (session.user as any).phone = token.phone;
+        (session.user as any).role = token.role;
+        (session.user as any).userType = token.userType;
+        (session.user as any).companyName = token.companyName;
       }
       return session;
     },

@@ -53,7 +53,7 @@ export const navigationItems: NavItem[] = [
   { label: "Cloud Costs", href: "/costs", icon: DollarSign, keywords: ["finops", "spend", "budget", "aws", "gcp", "azure"], group: "main" },
   { label: "Status Page", href: "/status", icon: Globe, keywords: ["uptime", "incidents", "public", "operational"], group: "main" },
   { label: "Task Board", href: "/kanban", icon: Kanban, keywords: ["board", "tasks", "drag", "drop", "sprint"], group: "main" },
-  { label: "On-Call Schedule", href: "/calendar", icon: Calendar, keywords: ["events", "schedule", "rotation"], group: "main" },
+  { label: "Bookings", href: "/bookings", icon: Calendar, keywords: ["events", "schedule", "rotation", "range"], group: "main" },
   { label: "Setup Wizard", href: "/wizard", icon: ListChecks, keywords: ["form", "steps", "onboarding", "service"], group: "main" },
   { label: "Cloud Billing", href: "/billing", icon: CreditCard, keywords: ["payment", "subscription", "cost", "spend"], group: "main" },
   { label: "Invoices", href: "/invoices", icon: FileText, keywords: ["bills", "receipts", "statements"], group: "main" },

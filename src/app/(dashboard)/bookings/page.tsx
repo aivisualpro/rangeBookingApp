@@ -316,9 +316,9 @@ export default function CalendarPage() {
       {/* Page header */}
       <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">Calendar</h1>
+          <h1 className="text-2xl font-bold tracking-tight">Bookings</h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            Schedule and manage events
+            Schedule and manage bookings
           </p>
         </div>
         <Dialog open={addDialogOpen} onOpenChange={setAddDialogOpen}>

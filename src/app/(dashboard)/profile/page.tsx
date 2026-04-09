@@ -136,10 +136,12 @@ function ProfileBanner({ user }: { user: ProfileUser }) {
             <MapPin className="h-3.5 w-3.5" />
             {user.location}
           </div>
-          <div className="flex items-center gap-1.5">
-            <Phone className="h-3.5 w-3.5" />
-            {user.phone}
-          </div>
+          {user.phone && (
+            <div className="flex items-center gap-1.5">
+              <Phone className="h-3.5 w-3.5" />
+              {user.phone}
+            </div>
+          )}
           <div className="flex items-center gap-1.5">
             <Globe className="h-3.5 w-3.5" />
             {user.website}
@@ -453,8 +455,25 @@ function ConnectionsTab() {
 
 // ── Main Page ──
 
+import { useSession } from "next-auth/react";
+
 export default function ProfilePage() {
-  const user = getProfileUser();
+  const { data: session } = useSession();
+  const authUser = session?.user as any;
+  
+  const mockUser = getProfileUser();
+
+  // Dynamically map session user into the Profile schema expected by the views
+  const user: ProfileUser = authUser ? {
+    ...mockUser, // keep mockup timeline/stats
+    firstName: authUser.name?.split(" ")[0] || "User",
+    lastName: authUser.name?.split(" ").slice(1).join(" ") || "",
+    role: authUser.role === "admin" ? "Administrator" : "Member",
+    department: authUser.companyName || "Internal Staff",
+    email: authUser.email || "",
+    phone: authUser.phone || "(555) 000-0000",
+    initials: `${authUser.name?.charAt(0) || "U"}${authUser.name?.split(" ").slice(1).join(" ")?.charAt(0) || ""}`.toUpperCase(),
+  } : mockUser;
 
   return (
     <>

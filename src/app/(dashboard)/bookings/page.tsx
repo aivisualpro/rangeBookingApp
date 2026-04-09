@@ -40,6 +40,7 @@ import {
   type CalendarEvent,
   type EventColor,
 } from "@dashboardpack/core/lib/data/calendar";
+import { HeaderActionsPortal } from "@/components/dashboard/header-portal";
 
 // ── Calendar helpers ────────────────────────────────────────────────────
 
@@ -182,6 +183,16 @@ export default function CalendarPage() {
   const [formEndTime, setFormEndTime] = useState("");
   const [formColor, setFormColor] = useState<EventColor>("primary");
   const [formDescription, setFormDescription] = useState("");
+  const [formBay, setFormBay] = useState<string>("");
+  const [allowedBays, setAllowedBays] = useState<any[]>([]);
+
+  // Fetch allowed bays on load
+  useEffect(() => {
+    fetch("/api/bays/allowed")
+      .then(res => res.ok ? res.json() : { data: [] })
+      .then(json => setAllowedBays(json.data || []))
+      .catch(() => {});
+  }, []);
 
   // Build grid
   const calendarDays = useMemo(
@@ -250,6 +261,7 @@ export default function CalendarPage() {
     setFormEndTime("");
     setFormColor("primary");
     setFormDescription("");
+    setFormBay("");
   }, []);
 
   // Add event handler
@@ -262,7 +274,7 @@ export default function CalendarPage() {
       time: formTime || undefined,
       endTime: formEndTime || undefined,
       color: formColor,
-      description: formDescription.trim() || undefined,
+      description: formDescription.trim() ? `${formDescription.trim()}\n\nBay Booking: ${allowedBays.find(b => b.id === formBay)?.bay_name || formBay}` : (formBay ? `Bay Booking: ${allowedBays.find(b => b.id === formBay)?.bay_name || formBay}` : undefined),
     });
 
     setEvents(getCalendarEvents());
@@ -313,19 +325,12 @@ export default function CalendarPage() {
 
   return (
     <>
-      {/* Page header */}
-      <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight">Bookings</h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Schedule and manage bookings
-          </p>
-        </div>
+      <HeaderActionsPortal>
         <Dialog open={addDialogOpen} onOpenChange={setAddDialogOpen}>
           <DialogTrigger asChild>
-            <Button onClick={() => openAddDialog()}>
-              <Plus className="me-2 h-4 w-4" />
-              Add Event
+            <Button onClick={() => openAddDialog()} size="sm" className="gap-1.5 h-9">
+              <Plus className="h-4 w-4" />
+              Create Booking
             </Button>
           </DialogTrigger>
           <AddEventDialog
@@ -341,10 +346,13 @@ export default function CalendarPage() {
             setFormColor={setFormColor}
             formDescription={formDescription}
             setFormDescription={setFormDescription}
+            formBay={formBay}
+            setFormBay={setFormBay}
+            allowedBays={allowedBays}
             onSubmit={handleAddEvent}
           />
         </Dialog>
-      </div>
+      </HeaderActionsPortal>
 
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-[1fr_340px]">
         {/* Calendar grid */}
@@ -605,6 +613,9 @@ interface AddEventDialogProps {
   setFormColor: (v: EventColor) => void;
   formDescription: string;
   setFormDescription: (v: string) => void;
+  formBay: string;
+  setFormBay: (v: string) => void;
+  allowedBays: any[];
   onSubmit: () => void;
 }
 
@@ -621,9 +632,12 @@ function AddEventDialog({
   setFormColor,
   formDescription,
   setFormDescription,
+  formBay,
+  setFormBay,
+  allowedBays,
   onSubmit,
 }: AddEventDialogProps) {
-  const isValid = formTitle.trim().length > 0 && formDate.length > 0;
+  const isValid = formTitle.trim().length > 0 && formDate.length > 0 && formBay.length > 0;
 
   return (
     <DialogContent>
@@ -648,17 +662,40 @@ function AddEventDialog({
           />
         </div>
 
-        {/* Date */}
-        <div className="grid gap-2">
-          <Label htmlFor="event-date">
-            Date <span className="text-destructive">*</span>
-          </Label>
-          <Input
-            id="event-date"
-            type="date"
-            value={formDate}
-            onChange={(e) => setFormDate(e.target.value)}
-          />
+        {/* Date and Bay */}
+        <div className="grid grid-cols-2 gap-4">
+          <div className="grid gap-2">
+            <Label htmlFor="event-date">
+              Date <span className="text-destructive">*</span>
+            </Label>
+            <Input
+              id="event-date"
+              type="date"
+              value={formDate}
+              onChange={(e) => setFormDate(e.target.value)}
+            />
+          </div>
+          <div className="grid gap-2">
+            <Label htmlFor="event-bay">
+              Select Bay <span className="text-destructive">*</span>
+            </Label>
+            <Select value={formBay} onValueChange={setFormBay}>
+              <SelectTrigger id="event-bay">
+                <SelectValue placeholder="Choose a bay..." />
+              </SelectTrigger>
+              <SelectContent>
+                {allowedBays.length === 0 ? (
+                  <div className="p-2 text-sm text-muted-foreground text-center">No authorized active bays.</div>
+                ) : (
+                  allowedBays.map(bay => (
+                    <SelectItem key={bay.id} value={bay.id}>
+                      {bay.bay_name}
+                    </SelectItem>
+                  ))
+                )}
+              </SelectContent>
+            </Select>
+          </div>
         </div>
 
         {/* Time row */}

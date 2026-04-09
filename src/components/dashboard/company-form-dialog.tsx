@@ -10,6 +10,7 @@ import {
 } from "@dashboardpack/core/components/ui/dialog";
 import { Button } from "@dashboardpack/core/components/ui/button";
 import { Input } from "@dashboardpack/core/components/ui/input";
+import { Checkbox } from "@dashboardpack/core/components/ui/checkbox";
 import { Switch } from "@dashboardpack/core/components/ui/switch";
 import { Label } from "@dashboardpack/core/components/ui/label";
 import { toast } from "sonner";
@@ -22,6 +23,7 @@ interface CompanyFormData {
   primary_contact_phone: string;
   status: string;
   insurance_status?: string;
+  allowed_bays?: string[];
 }
 
 interface CompanyFormDialogProps {
@@ -34,6 +36,14 @@ interface CompanyFormDialogProps {
 export function CompanyFormDialog({ open, onOpenChange, editCompany, onSuccess }: CompanyFormDialogProps) {
   const isEditing = !!editCompany?.id;
   const [saving, setSaving] = useState(false);
+  const [availableBays, setAvailableBays] = useState<any[]>([]);
+
+  useEffect(() => {
+    fetch("/api/bays")
+      .then(res => res.ok ? res.json() : { data: [] })
+      .then(json => setAvailableBays(json.data || []))
+      .catch(() => {});
+  }, []);
 
   const [formData, setFormData] = useState<CompanyFormData>({
     company_name: "",
@@ -55,6 +65,7 @@ export function CompanyFormDialog({ open, onOpenChange, editCompany, onSuccess }
           primary_contact_phone: editCompany.primary_contact_phone || "",
           status: editCompany.status || "inactive",
           insurance_status: editCompany.insurance_status || "pending",
+          allowed_bays: editCompany.allowed_bays || [],
         });
       } else {
         setFormData({
@@ -64,6 +75,7 @@ export function CompanyFormDialog({ open, onOpenChange, editCompany, onSuccess }
           primary_contact_phone: "",
           status: "inactive",
           insurance_status: "pending",
+          allowed_bays: [],
         });
       }
     }
@@ -81,7 +93,8 @@ export function CompanyFormDialog({ open, onOpenChange, editCompany, onSuccess }
         primary_contact_name: formData.primary_contact_name,
         primary_contact_email: formData.primary_contact_email,
         primary_contact_phone: formData.primary_contact_phone,
-        status: formData.status
+        status: formData.status,
+        allowed_bays: formData.allowed_bays
       } : formData;
 
       const res = await fetch(url, {
@@ -171,6 +184,30 @@ export function CompanyFormDialog({ open, onOpenChange, editCompany, onSuccess }
                 <option value="inactive">Inactive</option>
                 <option value="suspended">Suspended</option>
               </select>
+            </div>
+
+            <div className="flex flex-col gap-2 rounded-lg border p-4">
+              <div className="space-y-0.5 mb-2">
+                <Label className="text-sm font-medium">Allowed Bays</Label>
+                <p className="text-xs text-muted-foreground">Select which Range Bays this company is authorized to book.</p>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-40 overflow-y-auto">
+                {availableBays.map((bay) => (
+                  <label key={bay.id} className="flex items-center gap-2 cursor-pointer p-2 rounded hover:bg-muted/50 border border-transparent hover:border-border transition-colors">
+                    <Checkbox 
+                      checked={(formData.allowed_bays || []).includes(bay.id)}
+                      onCheckedChange={(checked) => {
+                        const current = new Set(formData.allowed_bays || []);
+                        if (checked) current.add(bay.id);
+                        else current.delete(bay.id);
+                        setFormData({ ...formData, allowed_bays: Array.from(current) });
+                      }}
+                    />
+                    <span className="text-sm font-medium">{bay.bay_name}</span>
+                  </label>
+                ))}
+                {availableBays.length === 0 && <span className="text-sm text-muted-foreground">No bays found.</span>}
+              </div>
             </div>
           </div>
 

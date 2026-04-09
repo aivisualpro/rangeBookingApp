@@ -62,7 +62,8 @@ export async function POST(req: Request) {
       status: body.status || "active",
       insurance_status: body.insurance_status || "pending",
       invite_token: inviteToken,
-      signup_url: signupUrl
+      signup_url: signupUrl,
+      allowed_bays: body.allowed_bays || []
     });
 
     const contactName = body.primary_contact_name || "Admin User";

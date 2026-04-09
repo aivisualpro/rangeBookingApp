@@ -193,6 +193,7 @@ export default function CompaniesPage() {
               primary_contact_phone: row.original.primary_contact_phone,
               status: row.original.status,
               insurance_status: row.original.insurance_status,
+              allowed_bays: row.original.allowed_bays || [],
             });
             setFormOpen(true);
           }}>

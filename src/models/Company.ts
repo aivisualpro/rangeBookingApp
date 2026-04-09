@@ -19,6 +19,7 @@ export interface ICompany extends Document {
   historical_coi_records: any;
   invite_token?: string;
   signup_url?: string;
+  allowed_bays: mongoose.Types.ObjectId[];
 }
 
 const CompanySchema = new Schema(
@@ -40,6 +41,7 @@ const CompanySchema = new Schema(
     historical_coi_records: { type: Schema.Types.Mixed },
     invite_token: { type: String, unique: true, sparse: true },
     signup_url: { type: String },
+    allowed_bays: [{ type: Schema.Types.ObjectId, ref: "RangeBay" }],
   },
   { timestamps: true }
 );

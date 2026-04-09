@@ -4,7 +4,7 @@ import connectToDatabase from "@/lib/mongodb";
 import User from "@/models/User";
 import bcrypt from "bcryptjs";
 
-const authOptions: NextAuthOptions = {
+export const authOptions: NextAuthOptions = {
   providers: [
     CredentialsProvider({
       name: "Credentials",
@@ -24,8 +24,12 @@ const authOptions: NextAuthOptions = {
         await connectToDatabase();
         const user: any = await User.findOne({ email: credentials.email }).populate("company_id");
 
-        if (!user || !user.password) {
-          throw new Error("User not found. Register First!");
+        if (!user) {
+          throw new Error("User not found. Please register first.");
+        }
+
+        if (!user.password) {
+          throw new Error("Your account is pending setup. Please use the registration page to create your password.");
         }
 
         if (user.company_id && user.company_id.status !== "active") {

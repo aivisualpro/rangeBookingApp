@@ -41,13 +41,29 @@ export async function POST(req: Request) {
     await connectToDatabase();
 
     const existingUser = await User.findOne({ email: data.email });
-    if (existingUser) {
-      return NextResponse.json({ error: "User with this email already exists" }, { status: 400 });
-    }
 
     let hashedPassword = undefined;
     if (data.password) {
       hashedPassword = await bcrypt.hash(data.password, 10);
+    }
+
+    if (existingUser) {
+      if (existingUser.password) {
+        return NextResponse.json({ error: "User with this email already exists and is fully registered." }, { status: 400 });
+      } else {
+        // This is a placeholder account lacking a password. Let's finish their setup!
+        existingUser.password = hashedPassword;
+        existingUser.first_name = data.first_name;
+        existingUser.last_name = data.last_name;
+        existingUser.phone = data.phone;
+        existingUser.user_type = data.user_type || existingUser.user_type;
+        existingUser.status = "inactive"; // Pending admin approval like any other new registration
+        if (data.company_id && data.company_id !== "none") {
+          existingUser.company_id = data.company_id;
+        }
+        await existingUser.save();
+        return NextResponse.json({ data: existingUser });
+      }
     }
 
     const newUser = await User.create({

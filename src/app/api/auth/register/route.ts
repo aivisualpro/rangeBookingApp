@@ -83,6 +83,7 @@ export async function POST(req: Request) {
       user_type: userType || "External",
       company_id: assignedCompanyId,
       status: "inactive",
+      phone: companyData?.primary_contact_phone || undefined,
     });
 
     return NextResponse.json({ success: true, userId: user._id });

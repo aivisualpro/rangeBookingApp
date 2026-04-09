@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo, useCallback } from "react";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { Card, CardContent } from "@dashboardpack/core/components/ui/card";
 import { Button } from "@dashboardpack/core/components/ui/button";
 import { Badge } from "@dashboardpack/core/components/ui/badge";
@@ -30,6 +30,10 @@ import {
   Clock,
   Trash2,
   X,
+  Target,
+  Crosshair,
+  DollarSign,
+  ListOrdered,
 } from "lucide-react";
 import { cn } from "@dashboardpack/core/lib/utils";
 import { toast } from "sonner";
@@ -637,135 +641,206 @@ function AddEventDialog({
   allowedBays,
   onSubmit,
 }: AddEventDialogProps) {
-  const isValid = formTitle.trim().length > 0 && formDate.length > 0 && formBay.length > 0;
+  const [step, setStep] = useState<1 | 2>(1);
+
+  const isStep1Valid = formBay.length > 0;
+  const isStep2Valid = formTitle.trim().length > 0 && formDate.length > 0;
+  const isValid = isStep1Valid && isStep2Valid;
+
+  const handleNext = () => setStep(2);
+  const handleBack = () => setStep(1);
 
   return (
-    <DialogContent>
+    <DialogContent className="sm:max-w-[600px]">
       <DialogHeader>
-        <DialogTitle>Add Event</DialogTitle>
+        <DialogTitle>{step === 1 ? "Select a Bay" : "Booking Details"}</DialogTitle>
         <DialogDescription>
-          Create a new event on your calendar.
+          {step === 1 
+            ? "Choose from your company's authorized range facilities."
+            : "Set the dates and final details for your reservation."}
         </DialogDescription>
       </DialogHeader>
 
-      <div className="grid gap-4 py-2">
-        {/* Title */}
-        <div className="grid gap-2">
-          <Label htmlFor="event-title">
-            Title <span className="text-destructive">*</span>
-          </Label>
-          <Input
-            id="event-title"
-            placeholder="Event title"
-            value={formTitle}
-            onChange={(e) => setFormTitle(e.target.value)}
-          />
-        </div>
-
-        {/* Date and Bay */}
-        <div className="grid grid-cols-2 gap-4">
-          <div className="grid gap-2">
-            <Label htmlFor="event-date">
-              Date <span className="text-destructive">*</span>
-            </Label>
-            <Input
-              id="event-date"
-              type="date"
-              value={formDate}
-              onChange={(e) => setFormDate(e.target.value)}
-            />
+      <div className="py-4">
+        {step === 1 ? (
+          <div className="space-y-4">
+            {allowedBays.length === 0 ? (
+               <div className="p-8 text-center border rounded-xl border-dashed bg-muted/20">
+                 <p className="text-sm text-foreground font-medium">No Bays Authorized</p>
+                 <p className="text-xs text-muted-foreground mt-1">Your company has not been assigned any active bays yet.</p>
+               </div>
+            ) : (
+               <div className="grid grid-cols-2 gap-3 max-h-[400px] overflow-y-auto pr-2 pb-2">
+                 {allowedBays.map(bay => (
+                   <button
+                     key={bay.id}
+                     type="button"
+                     onClick={() => setFormBay(bay.id)}
+                     className={`flex flex-col text-left transition-all rounded-xl border relative overflow-hidden focus:outline-none ${
+                       formBay === bay.id 
+                         ? "ring-2 ring-primary border-primary bg-primary/5 shadow-md" 
+                         : "hover:border-primary/50 hover:bg-muted/30 hover:shadow-sm"
+                     }`}
+                   >
+                     {/* Card Header area */}
+                     <div className="p-3 pb-2 flex-none w-full border-b border-border/40">
+                       <div className="flex items-start justify-between w-full">
+                         <div className="flex items-center gap-2">
+                           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 shrink-0">
+                             {bay.category?.toLowerCase().includes("cowboy") ? (
+                               <Crosshair className="h-4 w-4 text-amber-600" />
+                             ) : (
+                               <Target className="h-4 w-4 text-primary" />
+                             )}
+                           </div>
+                           <div className="min-w-0">
+                             <p className={`text-sm font-semibold truncate ${formBay === bay.id ? "text-primary" : "text-foreground"}`}>
+                               {bay.bay_name}
+                             </p>
+                             <p className="text-[11px] text-muted-foreground font-medium truncate">
+                               {bay.category || "Uncategorized"}
+                             </p>
+                           </div>
+                         </div>
+                         <Badge variant={bay.status === 'Active' ? 'success' : 'secondary'} className="text-[10px] shrink-0 ml-2">
+                           {bay.status || "Active"}
+                         </Badge>
+                       </div>
+                     </div>
+                     {/* Card Content area with metrics */}
+                     <div className="p-3 pt-2 flex-1 flex flex-col justify-between w-full bg-background/50">
+                       <div className="grid grid-cols-2 gap-y-2 gap-x-2 bg-muted/30 p-2 rounded-lg border border-border/50">
+                         <div className="space-y-0.5">
+                           <span className="flex items-center gap-1 text-[9px] uppercase font-bold text-muted-foreground">
+                             <DollarSign className="h-2.5 w-2.5" /> Base
+                           </span>
+                           <p className="text-sm font-bold text-foreground">${bay.base_price || 0}</p>
+                         </div>
+                         <div className="space-y-0.5">
+                           <span className="flex items-center gap-1 text-[9px] uppercase font-bold text-muted-foreground">
+                             <Clock className="h-2.5 w-2.5" /> Same Day
+                           </span>
+                           <p className="text-sm font-bold text-foreground">${bay.same_day_price || 0}</p>
+                         </div>
+                         <div className="space-y-0.5 col-span-2">
+                           <span className="flex items-center gap-1 text-[9px] uppercase font-bold text-muted-foreground">
+                             <ListOrdered className="h-2.5 w-2.5" /> Min. Fee
+                           </span>
+                           <p className="text-sm font-medium text-muted-foreground">${bay.minimum_booking_fee || 0}</p>
+                         </div>
+                       </div>
+                     </div>
+                   </button>
+                 ))}
+               </div>
+            )}
+            <div className="flex justify-end pt-4 border-t">
+              <Button type="button" onClick={handleNext} disabled={!isStep1Valid}>
+                Continue Details →
+              </Button>
+            </div>
           </div>
-          <div className="grid gap-2">
-            <Label htmlFor="event-bay">
-              Select Bay <span className="text-destructive">*</span>
-            </Label>
-            <Select value={formBay} onValueChange={setFormBay}>
-              <SelectTrigger id="event-bay">
-                <SelectValue placeholder="Choose a bay..." />
-              </SelectTrigger>
-              <SelectContent>
-                {allowedBays.length === 0 ? (
-                  <div className="p-2 text-sm text-muted-foreground text-center">No authorized active bays.</div>
-                ) : (
-                  allowedBays.map(bay => (
-                    <SelectItem key={bay.id} value={bay.id}>
-                      {bay.bay_name}
+        ) : (
+          <div className="grid gap-4 animate-in fade-in slide-in-from-right-4 duration-300">
+            {/* Title */}
+            <div className="grid gap-2">
+              <Label htmlFor="event-title">
+                Booking Title <span className="text-destructive">*</span>
+              </Label>
+              <Input
+                id="event-title"
+                placeholder="e.g. Instructor Certification"
+                value={formTitle}
+                onChange={(e) => setFormTitle(e.target.value)}
+              />
+            </div>
+
+            {/* Date */}
+            <div className="grid gap-2">
+              <Label htmlFor="event-date">
+                Date <span className="text-destructive">*</span>
+              </Label>
+              <Input
+                id="event-date"
+                type="date"
+                value={formDate}
+                onChange={(e) => setFormDate(e.target.value)}
+              />
+            </div>
+
+            {/* Time row */}
+            <div className="grid grid-cols-2 gap-4">
+              <div className="grid gap-2">
+                <Label htmlFor="event-time">Start Time</Label>
+                <Input
+                  id="event-time"
+                  type="time"
+                  value={formTime}
+                  onChange={(e) => setFormTime(e.target.value)}
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="event-end-time">End Time</Label>
+                <Input
+                  id="event-end-time"
+                  type="time"
+                  value={formEndTime}
+                  onChange={(e) => setFormEndTime(e.target.value)}
+                />
+              </div>
+            </div>
+
+            {/* Color */}
+            <div className="grid gap-2">
+              <Label htmlFor="event-color">Event Color Tag</Label>
+              <Select
+                value={formColor}
+                onValueChange={(v) => setFormColor(v as EventColor)}
+              >
+                <SelectTrigger className="w-full" id="event-color">
+                  <SelectValue placeholder="Select a color" />
+                </SelectTrigger>
+                <SelectContent>
+                  {COLOR_LABELS.map((c) => (
+                    <SelectItem key={c.value} value={c.value}>
+                      <span className="flex items-center gap-2">
+                        <span
+                          className={cn(
+                            "inline-block h-2.5 w-2.5 rounded-full",
+                            EVENT_COLOR_CLASSES[c.value]
+                          )}
+                        />
+                        {c.label}
+                      </span>
                     </SelectItem>
-                  ))
-                )}
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
 
-        {/* Time row */}
-        <div className="grid grid-cols-2 gap-4">
-          <div className="grid gap-2">
-            <Label htmlFor="event-time">Start Time</Label>
-            <Input
-              id="event-time"
-              type="time"
-              value={formTime}
-              onChange={(e) => setFormTime(e.target.value)}
-            />
-          </div>
-          <div className="grid gap-2">
-            <Label htmlFor="event-end-time">End Time</Label>
-            <Input
-              id="event-end-time"
-              type="time"
-              value={formEndTime}
-              onChange={(e) => setFormEndTime(e.target.value)}
-            />
-          </div>
-        </div>
+            {/* Description */}
+            <div className="grid gap-2">
+              <Label htmlFor="event-description">Description</Label>
+              <Textarea
+                id="event-description"
+                placeholder="Optional notes constraints or instructions"
+                value={formDescription}
+                onChange={(e) => setFormDescription(e.target.value)}
+                className="min-h-[80px]"
+              />
+            </div>
 
-        {/* Color */}
-        <div className="grid gap-2">
-          <Label htmlFor="event-color">Color</Label>
-          <Select
-            value={formColor}
-            onValueChange={(v) => setFormColor(v as EventColor)}
-          >
-            <SelectTrigger className="w-full" id="event-color">
-              <SelectValue placeholder="Select a color" />
-            </SelectTrigger>
-            <SelectContent>
-              {COLOR_LABELS.map((c) => (
-                <SelectItem key={c.value} value={c.value}>
-                  <span className="flex items-center gap-2">
-                    <span
-                      className={cn(
-                        "inline-block h-2.5 w-2.5 rounded-full",
-                        EVENT_COLOR_CLASSES[c.value]
-                      )}
-                    />
-                    {c.label}
-                  </span>
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-
-        {/* Description */}
-        <div className="grid gap-2">
-          <Label htmlFor="event-description">Description</Label>
-          <Textarea
-            id="event-description"
-            placeholder="Optional description"
-            value={formDescription}
-            onChange={(e) => setFormDescription(e.target.value)}
-            className="min-h-[80px]"
-          />
-        </div>
+            <DialogFooter className="pt-4 border-t flex items-center justify-between mt-2">
+               <Button type="button" variant="outline" onClick={handleBack}>
+                 ← Back
+               </Button>
+               <Button onClick={() => { onSubmit(); setStep(1); }} disabled={!isValid}>
+                 Book Now
+               </Button>
+            </DialogFooter>
+          </div>
+        )}
       </div>
-
-      <DialogFooter>
-        <Button onClick={onSubmit} disabled={!isValid}>
-          Create Event
-        </Button>
-      </DialogFooter>
     </DialogContent>
   );
 }

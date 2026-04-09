@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import connectToDatabase from "@/lib/mongodb";
 import Company from "@/models/Company";
 import User from "@/models/User";
+import mongoose from "mongoose";
 
 export async function GET(req: Request, context: { params: Promise<{ id: string }> }) {
   try {
@@ -32,7 +33,15 @@ export async function PUT(req: Request, context: { params: Promise<{ id: string 
     delete body.createdAt;
     delete body.updatedAt;
 
-    const company = await Company.findByIdAndUpdate(id, body, { new: true });
+    if (body.allowed_bays && Array.isArray(body.allowed_bays)) {
+      body.allowed_bays = body.allowed_bays.map((bayId: string) => new mongoose.Types.ObjectId(bayId));
+    }
+
+    const company = await Company.findByIdAndUpdate(
+      id, 
+      { $set: body }, 
+      { new: true, runValidators: true }
+    );
     
     if (!company) {
       return NextResponse.json({ error: "Not found" }, { status: 404 });

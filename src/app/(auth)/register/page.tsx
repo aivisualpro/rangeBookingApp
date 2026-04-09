@@ -21,6 +21,16 @@ import {
 } from "@dashboardpack/core/components/ui/card";
 import { Textarea } from "@dashboardpack/core/components/ui/textarea";
 
+export const formatPhoneNumber = (value: string) => {
+  if (!value) return value;
+  const phoneNumber = value.replace(/[^\d]/g, "");
+  if (phoneNumber.length < 4) return phoneNumber;
+  if (phoneNumber.length < 7) {
+    return `(${phoneNumber.slice(0, 3)}) ${phoneNumber.slice(3)}`;
+  }
+  return `(${phoneNumber.slice(0, 3)}) ${phoneNumber.slice(3, 6)}-${phoneNumber.slice(6, 10)}`;
+};
+
 function RegisterForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -93,7 +103,7 @@ function RegisterForm() {
   const hasCompanyStep = userType === "External" && externalMode === "new_company";
   const totalSteps = hasCompanyStep ? 3 : 2;
 
-  const nextStep = () => {
+  const nextStep = async () => {
     if (step === 1) {
       if (userType === "External" && externalMode === "existing_company" && !token.trim()) {
         toast.error("Please enter the company invite token.");
@@ -104,6 +114,57 @@ function RegisterForm() {
       if (!companyData.company_name.trim()) {
         toast.error("Company Name is required.");
         return;
+      }
+
+      // Pre-flight check on company availability
+      if (companyData.company_name) {
+         setLoading(true);
+         try {
+           const res = await fetch("/api/auth/check-company", {
+             method: "POST",
+             headers: { "Content-Type": "application/json" },
+             body: JSON.stringify({ company_name: companyData.company_name.trim() })
+           });
+           const data = await res.json();
+           if (data.exists) {
+             toast.warning(`The company "${companyData.company_name}" is already registered.`);
+             setLoading(false);
+             return;
+           }
+         } catch {
+           console.error("Failed to verify company");
+         }
+         setLoading(false);
+      }
+
+      // Pre-flight check on email availability
+      const checkEmailValue = companyData.primary_contact_email;
+      if (checkEmailValue) {
+         setLoading(true);
+         try {
+           const res = await fetch("/api/auth/check-email", {
+             method: "POST",
+             headers: { "Content-Type": "application/json" },
+             body: JSON.stringify({ email: checkEmailValue })
+           });
+           const data = await res.json();
+           if (data.exists) {
+             toast.warning(`Warning: this user is already available (as ${data.status}).`);
+             setLoading(false);
+             return;
+           }
+         } catch {
+           console.error("Failed to verify email");
+         }
+         setLoading(false);
+      }
+
+      // Auto-fill step 3 proactively without protecting existing old values
+      if (companyData.primary_contact_name) {
+         setName(companyData.primary_contact_name);
+      }
+      if (companyData.primary_contact_email) {
+         setEmail(companyData.primary_contact_email);
       }
     }
     setStep(prev => Math.min(prev + 1, totalSteps));
@@ -146,18 +207,11 @@ function RegisterForm() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error);
       
-      toast.success("Account created! Signing you in...");
-      const signInRes = await signIn("credentials", { email, password, redirect: false });
+      toast.success("Registration successful!");
       
-      if (signInRes?.error) {
-        if (signInRes.error === "Your account is pending activation.") {
-           router.push("/login?error=AccountInactive");
-        } else {
-           throw new Error(signInRes.error);
-        }
-      } else {
-        router.push("/dashboard");
-      }
+      // All newly registered users are hardcoded to "inactive" status in the backend 
+      // pending admin approval, so we can route them directly to the confirmation screen.
+      router.push("/login?error=AccountInactive");
     } catch (err: any) {
       toast.error(err.message || "An error occurred");
     } finally {
@@ -178,7 +232,7 @@ function RegisterForm() {
   return (
     <>
       <title>Create Account — Signal Dashboard</title>
-      <Card className={`w-full mx-auto shadow-xl transition-all animate-in fade-in slide-in-from-bottom-8 zoom-in-95 duration-700 fill-mode-both ${currentStepView === "Company" ? "max-w-4xl" : "max-w-xl"}`}>
+      <Card className={`w-full mx-auto shadow-xl transition-all animate-in fade-in slide-in-from-right-4 duration-500 ${currentStepView === "Company" ? "max-w-4xl" : "max-w-xl"}`}>
         <CardHeader className="text-center pb-2">
           <CardTitle className="text-3xl font-bold">Create your account</CardTitle>
           <CardDescription className="text-sm">
@@ -285,6 +339,7 @@ function RegisterForm() {
                        required
                        value={companyData.company_name}
                        onChange={(e) => setCompanyData({ ...companyData, company_name: e.target.value })}
+                       autoComplete="organization"
                      />
                    </div>
                    <div className="space-y-2 col-span-3 lg:col-span-2">
@@ -292,6 +347,7 @@ function RegisterForm() {
                      <Input
                        value={companyData.company_address}
                        onChange={(e) => setCompanyData({ ...companyData, company_address: e.target.value })}
+                       autoComplete="street-address"
                      />
                    </div>
                  </div>
@@ -302,6 +358,7 @@ function RegisterForm() {
                      <Input
                        value={companyData.primary_contact_name}
                        onChange={(e) => setCompanyData({ ...companyData, primary_contact_name: e.target.value })}
+                       autoComplete="name"
                      />
                    </div>
                    <div className="space-y-2">
@@ -310,13 +367,17 @@ function RegisterForm() {
                        type="email"
                        value={companyData.primary_contact_email}
                        onChange={(e) => setCompanyData({ ...companyData, primary_contact_email: e.target.value })}
+                       autoComplete="email"
                      />
                    </div>
                    <div className="space-y-2">
                       <Label>Primary Contact Phone</Label>
                       <Input
                         value={companyData.primary_contact_phone}
-                        onChange={(e) => setCompanyData({ ...companyData, primary_contact_phone: e.target.value })}
+                        onChange={(e) => setCompanyData({ ...companyData, primary_contact_phone: formatPhoneNumber(e.target.value) })}
+                        maxLength={14}
+                        placeholder="(555) 555-5555"
+                        autoComplete="tel"
                       />
                    </div>
                  </div>
@@ -327,6 +388,7 @@ function RegisterForm() {
                      <Input
                        value={companyData.billing_contact_name}
                        onChange={(e) => setCompanyData({ ...companyData, billing_contact_name: e.target.value })}
+                       autoComplete="name"
                      />
                    </div>
                    <div className="space-y-2">
@@ -335,13 +397,17 @@ function RegisterForm() {
                        type="email"
                        value={companyData.billing_contact_email}
                        onChange={(e) => setCompanyData({ ...companyData, billing_contact_email: e.target.value })}
+                       autoComplete="email"
                      />
                    </div>
                    <div className="space-y-2">
                       <Label>Billing Contact Phone</Label>
                       <Input
                         value={companyData.billing_contact_phone}
-                        onChange={(e) => setCompanyData({ ...companyData, billing_contact_phone: e.target.value })}
+                        onChange={(e) => setCompanyData({ ...companyData, billing_contact_phone: formatPhoneNumber(e.target.value) })}
+                        maxLength={14}
+                        placeholder="(555) 555-5555"
+                        autoComplete="tel"
                       />
                    </div>
                  </div>
@@ -370,6 +436,7 @@ function RegisterForm() {
                       value={name}
                       onChange={(e) => setName(e.target.value)}
                       required
+                      autoComplete="name"
                     />
                   </div>
                   <div className="space-y-2">
@@ -381,6 +448,7 @@ function RegisterForm() {
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       required
+                      autoComplete="email"
                     />
                   </div>
                   <div className="grid grid-cols-2 gap-3">
@@ -399,6 +467,7 @@ function RegisterForm() {
                            value={password}
                            onChange={(e) => setPassword(e.target.value)}
                            required
+                           autoComplete="new-password"
                          />
                          <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-2.5 text-muted-foreground hover:text-foreground">
                             {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}

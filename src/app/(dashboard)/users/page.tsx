@@ -21,7 +21,6 @@ interface UserRow {
   name: string;
   email: string;
   phone: string;
-  user_name: string;
   user_type: string;
   company_id: string;
   company_name: string;
@@ -31,9 +30,59 @@ interface UserRow {
   initials: string;
 }
 
-const statusVariant: Record<string, "success" | "secondary" | "destructive"> = {
+function StatusDropdownCell({ user, onUpdate }: { user: UserRow, onUpdate: () => void }) {
+  const [internalStatus, setInternalStatus] = useState(user.status);
+
+  React.useEffect(() => {
+    setInternalStatus(user.status);
+  }, [user.status]);
+
+  const updateStatus = async (newStatus: string) => {
+    if (newStatus === internalStatus) return;
+    
+    const previous = internalStatus;
+    setInternalStatus(newStatus);
+    
+    try {
+      const res = await fetch(`/api/users/${user.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: newStatus })
+      });
+      if (!res.ok) throw new Error();
+      toast.success(`User marked as ${newStatus}`);
+      onUpdate();
+    } catch {
+      setInternalStatus(previous);
+      toast.error("Failed to update status");
+    }
+  };
+
+  return (
+    <div className="relative inline-flex items-center group">
+      <select 
+        value={internalStatus}
+        onChange={(e) => updateStatus(e.target.value)}
+        className="appearance-none bg-transparent z-10 w-full h-full absolute inset-0 cursor-pointer opacity-0"
+        title="Change Status"
+      >
+        <option value="active">Active</option>
+        <option value="inactive">Inactive</option>
+        <option value="suspended">Suspended</option>
+      </select>
+      <Badge
+        variant={statusVariant[internalStatus] || "secondary"}
+        className="capitalize text-[11px] transition-all group-hover:ring-2 ring-primary/20 ring-offset-1"
+      >
+        {internalStatus}
+      </Badge>
+    </div>
+  );
+}
+
+const statusVariant: Record<string, "success" | "warning" | "destructive"> = {
   active: "success",
-  inactive: "secondary",
+  inactive: "warning",
   suspended: "destructive",
 };
 
@@ -46,8 +95,8 @@ export default function UsersPage() {
   const [formOpen, setFormOpen] = useState(false);
   const [editUser, setEditUser] = useState<any>(null);
 
-  const fetchUsers = async () => {
-    setIsLoading(true);
+  const fetchUsers = async (silent = false) => {
+    if (!silent) setIsLoading(true);
     try {
       const res = await fetch("/api/users");
       const json = await res.json();
@@ -55,7 +104,7 @@ export default function UsersPage() {
     } catch {
       toast.error("Failed to fetch users");
     } finally {
-      setIsLoading(false);
+      if (!silent) setIsLoading(false);
     }
   };
 
@@ -120,12 +169,7 @@ export default function UsersPage() {
         <DataTableColumnHeader column={column} title="Status" />
       ),
       cell: ({ row }) => (
-        <Badge
-          variant={statusVariant[row.original.status] || "secondary"}
-          className="capitalize text-[11px]"
-        >
-          {row.original.status}
-        </Badge>
+        <StatusDropdownCell user={row.original} onUpdate={() => fetchUsers(true)} />
       ),
       filterFn: (row, id, value) => value.includes(row.getValue(id)),
     },
@@ -179,7 +223,6 @@ export default function UsersPage() {
                 last_name: row.original.last_name,
                 email: row.original.email,
                 phone: row.original.phone,
-                user_name: row.original.user_name,
                 company_id: row.original.company_id,
                 status: row.original.status,
                 password: "",
@@ -262,7 +305,7 @@ export default function UsersPage() {
         open={formOpen}
         onOpenChange={setFormOpen}
         editUser={editUser}
-        onSuccess={fetchUsers}
+        onSuccess={() => fetchUsers(true)}
       />
 
       <ConfirmDialog
@@ -274,16 +317,20 @@ export default function UsersPage() {
         variant="destructive"
         onConfirm={async () => {
           if (deleteUserId) {
+            const backup = [...allUsers];
+            setAllUsers(prev => prev.filter(u => u.id !== deleteUserId));
+            toast.success("Deleting user in background...");
+            
             try {
               const res = await fetch(`/api/users/${deleteUserId}`, { method: "DELETE" });
               if (res.ok) {
-                toast.success("User deleted");
-                fetchUsers();
+                fetchUsers(true);
               } else {
-                toast.error("Failed to delete user");
+                throw new Error();
               }
             } catch {
-              toast.error("Server error");
+              setAllUsers(backup);
+              toast.error("Failed to delete user. Reverting...");
             }
             setDeleteUserId(null);
           }

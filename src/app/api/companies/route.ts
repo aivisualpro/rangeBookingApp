@@ -21,6 +21,15 @@ export async function POST(req: Request) {
     const body = await req.json();
     await connectToDatabase();
 
+    if (!body.company_name) {
+      return NextResponse.json({ error: "Company name is required" }, { status: 400 });
+    }
+
+    const existingCompany = await Company.findOne({ company_name: new RegExp(`^${body.company_name}$`, 'i') });
+    if (existingCompany) {
+      return NextResponse.json({ error: "A company with this name already exists" }, { status: 400 });
+    }
+
     const inviteToken = crypto.randomBytes(16).toString('hex');
     const signupUrl = `https://range-booking-app.vercel.app/register?type=external&token=${inviteToken}`;
 
@@ -30,7 +39,7 @@ export async function POST(req: Request) {
       primary_contact_name: body.primary_contact_name || "",
       primary_contact_email: body.primary_contact_email || "",
       primary_contact_phone: body.primary_contact_phone || "",
-      is_active: body.is_active ?? true,
+      status: body.status || "active",
       insurance_status: body.insurance_status || "pending",
       invite_token: inviteToken,
       signup_url: signupUrl

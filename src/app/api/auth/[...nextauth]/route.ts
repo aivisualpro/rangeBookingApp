@@ -22,10 +22,14 @@ export const authOptions: NextAuthOptions = {
         }
 
         await connectToDatabase();
-        const user: any = await User.findOne({ email: credentials.email });
+        const user: any = await User.findOne({ email: credentials.email }).populate("company_id");
 
         if (!user || !user.password) {
           throw new Error("User not found. Register First!");
+        }
+
+        if (user.company_id && user.company_id.status !== "active") {
+          throw new Error("Your company account is currently inactive. Please contact support.");
         }
         
         if (user.status !== "active") {
@@ -35,7 +39,7 @@ export const authOptions: NextAuthOptions = {
         const isMatch = await bcrypt.compare(credentials.password, user.password);
         if (!isMatch) throw new Error("Incorrect password");
 
-        return { id: user._id.toString(), email: user.email, name: `${user.first_name || ""} ${user.last_name || ""}`.trim() || user.user_name || "User" };
+        return { id: user._id.toString(), email: user.email, name: `${user.first_name || ""} ${user.last_name || ""}`.trim() || "User" };
       },
     }),
   ],

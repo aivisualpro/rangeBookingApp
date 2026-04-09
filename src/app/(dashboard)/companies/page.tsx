@@ -4,7 +4,7 @@
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import type { ColumnDef } from "@tanstack/react-table";
-import { Plus, Pencil, Trash2 } from "lucide-react";
+import { Plus, Pencil, Trash2, Share2, Copy } from "lucide-react";
 import { Button } from "@dashboardpack/core/components/ui/button";
 import { Badge } from "@dashboardpack/core/components/ui/badge";
 import { DataTable, DataTableColumnHeader } from "@/components/shared/data-table";
@@ -13,6 +13,65 @@ import { toast } from "sonner";
 import { HeaderSearchPortal, HeaderActionsPortal } from "@/components/dashboard/header-portal";
 import { Input } from "@dashboardpack/core/components/ui/input";
 import { CompanyFormDialog } from "@/components/dashboard/company-form-dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@dashboardpack/core/components/ui/dialog";
+
+function StatusDropdownCell({ company, onUpdate }: { company: any, onUpdate: () => void }) {
+  const [internalStatus, setInternalStatus] = useState(company.status || "inactive");
+
+  useEffect(() => {
+    setInternalStatus(company.status || "inactive");
+  }, [company.status]);
+
+  const updateStatus = async (newStatus: string) => {
+    if (newStatus === internalStatus) return;
+    
+    // Optimistic Background Update
+    const previousStatus = internalStatus;
+    setInternalStatus(newStatus);
+    
+    try {
+      const res = await fetch(`/api/companies/${company.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: newStatus })
+      });
+      if (!res.ok) throw new Error();
+      toast.success(`Company marked as ${newStatus}`);
+      // Silently refresh the table data without blocking
+      onUpdate();
+    } catch {
+      setInternalStatus(previousStatus);
+      toast.error("Failed to update status");
+    }
+  };
+
+  const statusVariant: Record<string, "success" | "warning" | "destructive"> = {
+    active: 'success',
+    inactive: 'warning',
+    suspended: 'destructive',
+  };
+
+  return (
+    <div className="relative inline-flex items-center group">
+      <select 
+        value={internalStatus}
+        onChange={(e) => updateStatus(e.target.value)}
+        className="appearance-none bg-transparent z-10 w-full h-full absolute inset-0 cursor-pointer opacity-0"
+        title="Change Status"
+      >
+        <option value="active">Active</option>
+        <option value="inactive">Inactive</option>
+        <option value="suspended">Suspended</option>
+      </select>
+      <Badge
+        variant={statusVariant[internalStatus] || 'warning'}
+        className="capitalize text-[11px] transition-all group-hover:ring-2 ring-primary/20 ring-offset-1"
+      >
+        {internalStatus}
+      </Badge>
+    </div>
+  );
+}
 
 export default function CompaniesPage() {
   const router = useRouter();
@@ -22,9 +81,10 @@ export default function CompaniesPage() {
   const [globalFilter, setGlobalFilter] = useState("");
   const [formOpen, setFormOpen] = useState(false);
   const [editCompany, setEditCompany] = useState<any>(null);
+  const [shareCompany, setShareCompany] = useState<any>(null);
 
-  const fetchCompanies = async () => {
-    setIsLoading(true);
+  const fetchCompanies = async (silent = false) => {
+    if (!silent) setIsLoading(true);
     try {
       const res = await fetch("/api/companies");
       const json = await res.json();
@@ -34,7 +94,7 @@ export default function CompaniesPage() {
     } catch (err) {
       toast.error("Failed to fetch companies");
     } finally {
-      setIsLoading(false);
+      if (!silent) setIsLoading(false);
     }
   };
 
@@ -44,16 +104,22 @@ export default function CompaniesPage() {
 
   const handleDelete = async () => {
     if (!deleteId) return;
+    
+    // Background optimistic deletion
+    const backup = [...companies];
+    setCompanies(prev => prev.filter(c => c.id !== deleteId));
+    toast.success("Deleting company in background...");
+    
     try {
       const res = await fetch(`/api/companies/${deleteId}`, { method: "DELETE" });
       if (res.ok) {
-        toast.success("Company and associated users deleted.");
-        fetchCompanies();
+        fetchCompanies(true);
       } else {
-        toast.error("Failed to delete.");
+        throw new Error();
       }
     } catch (err) {
-      toast.error("An error occurred");
+      setCompanies(backup);
+      toast.error("Failed to delete company. Reverting...");
     } finally {
       setDeleteId(null);
     }
@@ -94,18 +160,20 @@ export default function CompaniesPage() {
       )
     },
     {
-      accessorKey: "is_active",
+      accessorKey: "status",
       header: ({ column }) => <DataTableColumnHeader column={column} title="Status" />,
-      cell: ({ row }) => (
-        <Badge variant={row.original.is_active ? 'success' : 'destructive'}>
-          {row.original.is_active ? "Active" : "Inactive"}
-        </Badge>
-      )
+      cell: ({ row }) => <StatusDropdownCell company={row.original} onUpdate={() => fetchCompanies(true)} />
     },
     {
       id: "actions",
       cell: ({ row }) => (
         <div className="flex items-center gap-1 justify-end">
+          <Button variant="ghost" size="icon" onClick={(e) => { 
+            e.stopPropagation(); 
+            setShareCompany(row.original);
+          }} title="Share Join Link">
+            <Share2 className="h-4 w-4" />
+          </Button>
           <Button variant="ghost" size="icon" onClick={(e) => { 
             e.stopPropagation(); 
             setEditCompany({
@@ -114,7 +182,7 @@ export default function CompaniesPage() {
               primary_contact_name: row.original.primary_contact_name,
               primary_contact_email: row.original.primary_contact_email,
               primary_contact_phone: row.original.primary_contact_phone,
-              is_active: row.original.is_active,
+              status: row.original.status,
               insurance_status: row.original.insurance_status,
             });
             setFormOpen(true);
@@ -168,8 +236,52 @@ export default function CompaniesPage() {
         open={formOpen}
         onOpenChange={setFormOpen}
         editCompany={editCompany}
-        onSuccess={fetchCompanies}
+        onSuccess={() => fetchCompanies(true)}
       />
+
+      <Dialog open={!!shareCompany} onOpenChange={(v) => !v && setShareCompany(null)}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Share Company Registration</DialogTitle>
+            <DialogDescription>
+              Provide this generated URL or QR code to new external members so they can join <strong className="text-primary">{shareCompany?.company_name}</strong>.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex flex-col items-center space-y-6 pt-4">
+            <div className="bg-white p-3 rounded-xl border shadow-sm">
+              <img 
+                src={shareCompany?.signup_url ? `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(shareCompany.signup_url)}` : ""} 
+                alt="QR Code" 
+                className="w-48 h-48"
+              />
+            </div>
+            
+            <div className="w-full space-y-2">
+              <p className="text-xs font-medium uppercase text-muted-foreground tracking-wider">Direct Invite Link</p>
+              <div className="flex gap-2">
+                <Input 
+                  readOnly 
+                  value={shareCompany?.signup_url || "Link not generated"} 
+                  className="bg-muted text-xs font-mono h-10" 
+                />
+                <Button 
+                  size="icon" 
+                  className="shrink-0 h-10 w-10 btn-hover-effect"
+                  disabled={!shareCompany?.signup_url}
+                  onClick={() => {
+                    if (shareCompany?.signup_url) {
+                       navigator.clipboard.writeText(shareCompany.signup_url);
+                       toast.success("Copied to clipboard!");
+                    }
+                  }}
+                >
+                  <Copy className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </>
   );
 }

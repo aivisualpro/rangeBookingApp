@@ -30,7 +30,6 @@ interface UserFormData {
   last_name: string;
   email: string;
   phone: string;
-  user_name: string;
   password: string;
   company_id: string;
   status: string;
@@ -64,6 +63,16 @@ function generatePassword(length = 16): string {
   return pwd.split("").sort(() => Math.random() - 0.5).join("");
 }
 
+function formatPhoneNumber(value: string) {
+  if (!value) return value;
+  const phoneNumber = value.replace(/[^\d]/g, "");
+  if (phoneNumber.length < 4) return phoneNumber;
+  if (phoneNumber.length < 7) {
+    return `(${phoneNumber.slice(0, 3)}) ${phoneNumber.slice(3)}`;
+  }
+  return `(${phoneNumber.slice(0, 3)}) ${phoneNumber.slice(3, 6)}-${phoneNumber.slice(6, 10)}`;
+}
+
 function getPasswordStrength(pwd: string): { label: string; score: number; color: string; icon: React.ElementType } {
   if (!pwd) return { label: "None", score: 0, color: "bg-muted", icon: Shield };
   let score = 0;
@@ -91,7 +100,6 @@ export function UserFormDialog({ open, onOpenChange, editUser, onSuccess }: User
     last_name: "",
     email: "",
     phone: "",
-    user_name: "",
     password: "",
     company_id: "none",
     status: "active",
@@ -112,7 +120,6 @@ export function UserFormDialog({ open, onOpenChange, editUser, onSuccess }: User
           last_name: "",
           email: "",
           phone: "",
-          user_name: "",
           password: "",
           company_id: "none",
           status: "active",
@@ -221,14 +228,13 @@ export function UserFormDialog({ open, onOpenChange, editUser, onSuccess }: User
             </div>
             <div className="space-y-2">
               <Label>Phone</Label>
-              <Input value={form.phone} onChange={e => set("phone", e.target.value)} placeholder="(555) 123-4567" />
+              <Input 
+                 value={form.phone} 
+                 onChange={e => set("phone", formatPhoneNumber(e.target.value))} 
+                 placeholder="(555) 123-4567"
+                 maxLength={14} 
+              />
             </div>
-          </div>
-
-          {/* Username */}
-          <div className="space-y-2">
-            <Label>Username</Label>
-            <Input value={form.user_name} onChange={e => set("user_name", e.target.value)} placeholder="john_doe" />
           </div>
 
           {/* Password with strength meter */}

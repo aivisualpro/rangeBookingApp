@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import connectToDatabase from "@/lib/mongodb";
 import User from "@/models/User";
+import Company from "@/models/Company";
 import bcrypt from "bcryptjs";
 
 export async function GET() {
@@ -9,7 +10,7 @@ export async function GET() {
     const users = await User.find({}).populate("company_id").sort({ createdAt: -1 });
     
     const mappedUsers = users.map(u => {
-      const fullName = `${u.first_name || ""} ${u.last_name || ""}`.trim() || u.user_name || "Unknown User";
+      const fullName = `${u.first_name || ""} ${u.last_name || ""}`.trim() || "Unknown User";
       const company = u.company_id as any;
       return {
         id: u._id.toString(),
@@ -18,7 +19,6 @@ export async function GET() {
         name: fullName,
         email: u.email,
         phone: u.phone || "",
-        user_name: u.user_name || "",
         user_type: u.user_type || "External",
         company_id: company?._id?.toString() || "",
         company_name: company?.company_name || "",
@@ -56,7 +56,6 @@ export async function POST(req: Request) {
       last_name: data.last_name,
       email: data.email,
       phone: data.phone,
-      user_name: data.user_name,
       password: hashedPassword,
       company_id: data.company_id && data.company_id !== "none" ? data.company_id : undefined,
       status: data.status || "inactive",

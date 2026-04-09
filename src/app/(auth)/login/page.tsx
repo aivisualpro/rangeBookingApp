@@ -88,7 +88,7 @@ export default function LoginPage() {
         </div>
       )}
 
-      <Card className="w-full mx-auto max-w-md shadow-xl lg:max-w-[450px] animate-in fade-in slide-in-from-bottom-8 zoom-in-95 duration-700 fill-mode-both">
+      <Card className="w-full mx-auto max-w-md shadow-xl lg:max-w-[450px] animate-in fade-in slide-in-from-right-4 duration-500">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl">Welcome back</CardTitle>
           <CardDescription>Sign in to your account</CardDescription>

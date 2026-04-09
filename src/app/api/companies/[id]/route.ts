@@ -38,6 +38,13 @@ export async function PUT(req: Request, context: { params: Promise<{ id: string 
       return NextResponse.json({ error: "Not found" }, { status: 404 });
     }
 
+    if (body.status === "inactive" || body.status === "suspended") {
+      await User.updateMany(
+        { company_id: id },
+        { $set: { status: body.status } }
+      );
+    }
+
     return NextResponse.json({ success: true, data: company });
   } catch (error: any) {
     console.error("PUT error:", error.message);

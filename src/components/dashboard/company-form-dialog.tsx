@@ -20,7 +20,7 @@ interface CompanyFormData {
   primary_contact_name: string;
   primary_contact_email: string;
   primary_contact_phone: string;
-  is_active: boolean;
+  status: string;
   insurance_status?: string;
 }
 
@@ -40,7 +40,7 @@ export function CompanyFormDialog({ open, onOpenChange, editCompany, onSuccess }
     primary_contact_name: "",
     primary_contact_email: "",
     primary_contact_phone: "",
-    is_active: true,
+    status: "inactive",
     insurance_status: "pending",
   });
 
@@ -53,7 +53,7 @@ export function CompanyFormDialog({ open, onOpenChange, editCompany, onSuccess }
           primary_contact_name: editCompany.primary_contact_name || "",
           primary_contact_email: editCompany.primary_contact_email || "",
           primary_contact_phone: editCompany.primary_contact_phone || "",
-          is_active: editCompany.is_active ?? true,
+          status: editCompany.status || "inactive",
           insurance_status: editCompany.insurance_status || "pending",
         });
       } else {
@@ -62,7 +62,7 @@ export function CompanyFormDialog({ open, onOpenChange, editCompany, onSuccess }
           primary_contact_name: "",
           primary_contact_email: "",
           primary_contact_phone: "",
-          is_active: true,
+          status: "inactive",
           insurance_status: "pending",
         });
       }
@@ -81,7 +81,7 @@ export function CompanyFormDialog({ open, onOpenChange, editCompany, onSuccess }
         primary_contact_name: formData.primary_contact_name,
         primary_contact_email: formData.primary_contact_email,
         primary_contact_phone: formData.primary_contact_phone,
-        is_active: formData.is_active
+        status: formData.status
       } : formData;
 
       const res = await fetch(url, {
@@ -156,15 +156,21 @@ export function CompanyFormDialog({ open, onOpenChange, editCompany, onSuccess }
                />
             </div>
 
-            <div className="flex items-center justify-between rounded-lg border p-4">
-              <div className="space-y-0.5">
-                <Label className="text-sm font-medium">Active Status</Label>
-                <p className="text-xs text-muted-foreground">Allow this company and its users to log in.</p>
+            <div className="flex flex-col gap-2 rounded-lg border p-4">
+              <div className="space-y-0.5 mb-2">
+                <Label className="text-sm font-medium">Account Status</Label>
+                <p className="text-xs text-muted-foreground">Select the operational status of this firm.</p>
               </div>
-              <Switch 
-                checked={formData.is_active} 
-                onCheckedChange={(v) => setFormData({ ...formData, is_active: v })} 
-              />
+              <select 
+                title="Account Status"
+                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                value={formData.status} 
+                onChange={(e) => setFormData({ ...formData, status: e.target.value })} 
+              >
+                <option value="active">Active</option>
+                <option value="inactive">Inactive</option>
+                <option value="suspended">Suspended</option>
+              </select>
             </div>
           </div>
 

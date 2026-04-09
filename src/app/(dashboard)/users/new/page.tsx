@@ -39,7 +39,6 @@ const userSchema = z.object({
   last_name: z.string().min(1, "Last name is required"),
   email: z.string().email("Please enter a valid email address"),
   phone: z.string().optional(),
-  user_name: z.string().min(1, "User name is required"),
   password: z.string().min(6, "Password must be at least 6 characters").optional().or(z.literal("")),
   company_id: z.string().optional(),
   status: z.enum(["active", "inactive", "suspended"]),
@@ -78,7 +77,6 @@ export default function NewUserPage() {
       last_name: "",
       email: "",
       phone: "",
-      user_name: "",
       password: "",
       company_id: "none",
       status: "active",
@@ -173,20 +171,6 @@ export default function NewUserPage() {
                   )}
                 />
               </div>
-
-              <FormField
-                control={form.control}
-                name="user_name"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>User Name</FormLabel>
-                    <FormControl>
-                      <Input placeholder="e.g. emma_w" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
 
               <div className="grid grid-cols-2 gap-4">
                 <FormField

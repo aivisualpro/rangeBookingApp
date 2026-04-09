@@ -19,23 +19,21 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
     const data = await req.json();
     await connectToDatabase();
 
-    const updatePayload: any = {
-      user_type: data.user_type,
-      first_name: data.first_name,
-      last_name: data.last_name,
-      email: data.email,
-      phone: data.phone,
-      user_name: data.user_name,
-      status: data.status,
-      role: data.role,
-      company_id: data.company_id && data.company_id !== "none" ? data.company_id : null,
-    };
+    // Prevent updating protected fields
+    delete data.id;
+    delete data._id;
+    delete data.createdAt;
+    delete data.updatedAt;
 
-    if (data.password) {
-      updatePayload.password = data.password;
+    if (data.company_id === "none") {
+      data.company_id = null;
     }
 
-    const updatedUser = await User.findByIdAndUpdate(id, updatePayload, { new: true });
+    if (data.password) {
+      data.password = await require("bcryptjs").hash(data.password, 10);
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(id, { $set: data }, { new: true });
     if (!updatedUser) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }

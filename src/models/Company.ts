@@ -11,7 +11,7 @@ export interface ICompany extends Document {
   billing_contact_phone: string;
   company_address: string;
   notes: string;
-  is_active: boolean;
+  status: string;
   approved_bays: any;
   booking_privileges: any;
   insurance_status: string;
@@ -32,7 +32,7 @@ const CompanySchema = new Schema(
     billing_contact_phone: { type: String },
     company_address: { type: String },
     notes: { type: String },
-    is_active: { type: Boolean, default: true },
+    status: { type: String, enum: ["active", "inactive", "suspended"], default: "inactive" },
     approved_bays: { type: Schema.Types.Mixed },
     booking_privileges: { type: Schema.Types.Mixed },
     insurance_status: { type: String, default: "pending" },

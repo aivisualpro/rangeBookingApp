@@ -48,6 +48,11 @@ export async function POST(req: Request) {
           return NextResponse.json({ error: "Company name is required for registering a new company" }, { status: 400 });
         }
         
+        const existingComp = await Company.findOne({ company_name: new RegExp(`^${companyData.company_name}$`, 'i') });
+        if (existingComp) {
+           return NextResponse.json({ error: "A company with this name already exists" }, { status: 400 });
+        }
+        
         const inviteToken = crypto.randomBytes(16).toString('hex');
         const signupUrl = `https://range-booking-app.vercel.app/register?type=external&token=${inviteToken}`;
         
@@ -61,7 +66,7 @@ export async function POST(req: Request) {
           billing_contact_phone: companyData.billing_contact_phone || "",
           company_address: companyData.company_address || "",
           notes: companyData.notes || "",
-          is_active: false, // Default to inactive approval needed
+          status: "inactive", // Default to inactive approval needed
           invite_token: inviteToken,
           signup_url: signupUrl
         });

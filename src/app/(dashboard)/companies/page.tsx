@@ -160,6 +160,15 @@ export default function CompaniesPage() {
       )
     },
     {
+      accessorKey: "users_count",
+      header: ({ column }) => <DataTableColumnHeader column={column} title="Users (Active / Total)" />,
+      cell: ({ row }) => (
+        <Badge variant="outline" className="font-mono text-[10px] tracking-widest bg-muted/30">
+          {row.original.users_count || "0 / 0"}
+        </Badge>
+      )
+    },
+    {
       accessorKey: "status",
       header: ({ column }) => <DataTableColumnHeader column={column} title="Status" />,
       cell: ({ row }) => <StatusDropdownCell company={row.original} onUpdate={() => fetchCompanies(true)} />

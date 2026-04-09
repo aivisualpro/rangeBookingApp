@@ -9,7 +9,27 @@ export async function GET() {
   try {
     await connectToDatabase();
     const companies = await Company.find().sort({ createdAt: -1 }).limit(100);
-    return NextResponse.json({ data: companies });
+    const companyIds = companies.map(c => c._id);
+    
+    // Fetch active & total users per company
+    const userStats = await User.aggregate([
+      { $match: { company_id: { $in: companyIds } } },
+      { $group: { 
+          _id: "$company_id", 
+          total: { $sum: 1 },
+          active: { $sum: { $cond: [{ $eq: ["$status", "active"] }, 1, 0] } }
+        } 
+      }
+    ]);
+
+    const mappedCompanies = companies.map(c => {
+      const doc = c.toJSON();
+      const stats = userStats.find(s => s._id.toString() === doc.id.toString()) || { total: 0, active: 0 };
+      doc.users_count = `${stats.active} / ${stats.total}`;
+      return doc;
+    });
+
+    return NextResponse.json({ data: mappedCompanies });
   } catch (error: any) {
     console.error("GET /api/companies error:", error.message);
     return NextResponse.json({ error: error.message }, { status: 500 });

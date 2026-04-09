@@ -88,11 +88,25 @@ function RegisterForm() {
 
   const [loading, setLoading] = useState(false);
 
+  const [invitedCompanyName, setInvitedCompanyName] = useState("");
+
   useEffect(() => {
     if (tokenParam) {
       setToken(tokenParam);
       setUserType("External");
       setExternalMode("existing_company");
+      
+      // Auto-skip to Step 2
+      setStep(2);
+      
+      // Lookup the company name magically
+      fetch(`/api/auth/token-lookup?token=${tokenParam}`)
+        .then(r => r.ok ? r.json() : {})
+        .then((data: any) => {
+          if (data?.companyName) setInvitedCompanyName(data.companyName);
+        })
+        .catch(() => {});
+        
     } else if (typeParam === "external") {
       setUserType("External");
     }
@@ -234,7 +248,14 @@ function RegisterForm() {
       <title>Create Account — Signal Dashboard</title>
       <Card className={`w-full mx-auto shadow-xl transition-all animate-in fade-in slide-in-from-right-4 duration-500 ${currentStepView === "Company" ? "max-w-4xl" : "max-w-xl"}`}>
         <CardHeader className="text-center pb-2">
-          <CardTitle className="text-3xl font-bold">Create your account</CardTitle>
+          <CardTitle className="text-3xl font-bold">
+            Create your account
+            {invitedCompanyName && (
+              <span className="block text-xl text-primary font-medium mt-1">
+                (as {invitedCompanyName})
+              </span>
+            )}
+          </CardTitle>
           <CardDescription className="text-sm">
             Step {step} of {totalSteps}
           </CardDescription>

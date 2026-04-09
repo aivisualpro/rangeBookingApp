@@ -12,6 +12,7 @@ import { ConfirmDialog } from "@dashboardpack/core/components/shared/confirm-dia
 import { toast } from "sonner";
 import { HeaderSearchPortal, HeaderActionsPortal } from "@/components/dashboard/header-portal";
 import { Input } from "@dashboardpack/core/components/ui/input";
+import { CompanyFormDialog } from "@/components/dashboard/company-form-dialog";
 
 export default function CompaniesPage() {
   const router = useRouter();
@@ -19,6 +20,8 @@ export default function CompaniesPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [globalFilter, setGlobalFilter] = useState("");
+  const [formOpen, setFormOpen] = useState(false);
+  const [editCompany, setEditCompany] = useState<any>(null);
 
   const fetchCompanies = async () => {
     setIsLoading(true);
@@ -103,7 +106,19 @@ export default function CompaniesPage() {
       id: "actions",
       cell: ({ row }) => (
         <div className="flex items-center gap-1 justify-end">
-          <Button variant="ghost" size="icon" onClick={(e) => { e.stopPropagation(); router.push(`/companies/${row.original.id}/edit`); }}>
+          <Button variant="ghost" size="icon" onClick={(e) => { 
+            e.stopPropagation(); 
+            setEditCompany({
+              id: row.original.id,
+              company_name: row.original.company_name,
+              primary_contact_name: row.original.primary_contact_name,
+              primary_contact_email: row.original.primary_contact_email,
+              primary_contact_phone: row.original.primary_contact_phone,
+              is_active: row.original.is_active,
+              insurance_status: row.original.insurance_status,
+            });
+            setFormOpen(true);
+          }}>
             <Pencil className="h-4 w-4" />
           </Button>
           <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive" onClick={(e) => { e.stopPropagation(); setDeleteId(row.original.id); }}>
@@ -126,7 +141,7 @@ export default function CompaniesPage() {
       </HeaderSearchPortal>
 
       <HeaderActionsPortal>
-        <Button onClick={() => router.push("/companies/new")} size="sm" className="gap-1.5 h-9">
+        <Button onClick={() => { setEditCompany(null); setFormOpen(true); }} size="sm" className="gap-1.5 h-9">
           <Plus className="h-4 w-4" />
           Add Company
         </Button>
@@ -147,6 +162,13 @@ export default function CompaniesPage() {
         confirmLabel="Delete"
         variant="destructive"
         onConfirm={handleDelete}
+      />
+
+      <CompanyFormDialog 
+        open={formOpen}
+        onOpenChange={setFormOpen}
+        editCompany={editCompany}
+        onSuccess={fetchCompanies}
       />
     </>
   );

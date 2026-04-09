@@ -7,8 +7,8 @@ export default function AuthLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-background via-background to-primary/5 p-4">
-      <div className="w-full max-w-md">
+    <div className="flex min-h-[100dvh] w-full items-center justify-center bg-gradient-to-br from-background via-background to-primary/5 p-4">
+      <div className="w-full max-w-5xl mx-auto flex flex-col items-center justify-center">
         <Link
           href="/"
           className="mb-8 flex items-center justify-center gap-2"

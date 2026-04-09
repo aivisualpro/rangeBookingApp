@@ -12,6 +12,7 @@ import { ConfirmDialog } from "@dashboardpack/core/components/shared/confirm-dia
 import { toast } from "sonner";
 import { HeaderSearchPortal, HeaderActionsPortal } from "@/components/dashboard/header-portal";
 import { Input } from "@dashboardpack/core/components/ui/input";
+import { BayFormDialog } from "@/components/dashboard/bay-form-dialog";
 
 export default function BaysPage() {
   const router = useRouter();
@@ -19,6 +20,8 @@ export default function BaysPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [globalFilter, setGlobalFilter] = useState("");
+  const [formOpen, setFormOpen] = useState(false);
+  const [editBay, setEditBay] = useState<any>(null);
 
   const fetchBays = async () => {
     setIsLoading(true);
@@ -90,7 +93,24 @@ export default function BaysPage() {
       id: "actions",
       cell: ({ row }) => (
         <div className="flex items-center gap-1 justify-end">
-          <Button variant="ghost" size="icon" onClick={(e) => { e.stopPropagation(); router.push(`/bays/${row.original.id}/edit`); }}>
+          <Button variant="ghost" size="icon" onClick={(e) => { 
+            e.stopPropagation(); 
+            setEditBay({
+              id: row.original.id,
+              bay_name: row.original.bay_name,
+              category: row.original.category,
+              description: row.original.description,
+              primary_image: row.original.primary_image,
+              layout_image: row.original.layout_image,
+              rules: row.original.rules,
+              base_price: row.original.base_price,
+              same_day_price: row.original.same_day_price,
+              minimum_booking_fee: row.original.minimum_booking_fee,
+              per_person_rate: row.original.per_person_rate,
+              status: row.original.status,
+            });
+            setFormOpen(true);
+          }}>
             <Pencil className="h-4 w-4" />
           </Button>
           <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive" onClick={(e) => { e.stopPropagation(); setDeleteId(row.original.id); }}>
@@ -113,7 +133,7 @@ export default function BaysPage() {
       </HeaderSearchPortal>
 
       <HeaderActionsPortal>
-        <Button onClick={() => router.push("/bays/new")} size="sm" className="gap-1.5 h-9">
+        <Button onClick={() => { setEditBay(null); setFormOpen(true); }} size="sm" className="gap-1.5 h-9">
           <Plus className="h-4 w-4" />
           Add Bay
         </Button>
@@ -134,6 +154,13 @@ export default function BaysPage() {
         confirmLabel="Delete"
         variant="destructive"
         onConfirm={handleDelete}
+      />
+
+      <BayFormDialog 
+        open={formOpen}
+        onOpenChange={setFormOpen}
+        editBay={editBay}
+        onSuccess={fetchBays}
       />
     </>
   );

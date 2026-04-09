@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import connectToDatabase from "@/lib/mongodb";
 import User from "@/models/User";
+import bcrypt from "bcryptjs";
 
 export async function GET() {
   try {
@@ -44,6 +45,11 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "User with this email already exists" }, { status: 400 });
     }
 
+    let hashedPassword = undefined;
+    if (data.password) {
+      hashedPassword = await bcrypt.hash(data.password, 10);
+    }
+
     const newUser = await User.create({
       user_type: data.user_type || "External",
       first_name: data.first_name,
@@ -51,7 +57,7 @@ export async function POST(req: Request) {
       email: data.email,
       phone: data.phone,
       user_name: data.user_name,
-      password: data.password || undefined,
+      password: hashedPassword,
       company_id: data.company_id && data.company_id !== "none" ? data.company_id : undefined,
       status: data.status || "inactive",
       role: data.role || "member",

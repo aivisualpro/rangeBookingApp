@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import connectToDatabase from "@/lib/mongodb";
 import Company from "@/models/Company";
 import User from "@/models/User";
+import crypto from "crypto";
 
 export async function GET() {
   try {
@@ -20,6 +21,9 @@ export async function POST(req: Request) {
     const body = await req.json();
     await connectToDatabase();
 
+    const inviteToken = crypto.randomBytes(16).toString('hex');
+    const signupUrl = `https://range-booking-app.vercel.app/register?type=external&token=${inviteToken}`;
+
     // Insert company
     const newCompany = await Company.create({
       company_name: body.company_name,
@@ -28,13 +32,19 @@ export async function POST(req: Request) {
       primary_contact_phone: body.primary_contact_phone || "",
       is_active: body.is_active ?? true,
       insurance_status: body.insurance_status || "pending",
+      invite_token: inviteToken,
+      signup_url: signupUrl
     });
+
+    const contactName = body.primary_contact_name || "Admin User";
+    const nameParts = contactName.split(" ");
 
     // Insert associated default user
     await User.create({
       company_id: newCompany._id,
       email: body.primary_contact_email || `admin@company-${newCompany._id.toString().slice(-4)}.test`,
-      full_name: body.primary_contact_name || "Admin User",
+      first_name: nameParts[0],
+      last_name: nameParts.slice(1).join(" ") || "",
       role: "admin",
     });
 

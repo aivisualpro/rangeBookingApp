@@ -1,5 +1,4 @@
 import NextAuth, { NextAuthOptions } from "next-auth";
-import GoogleProvider from "next-auth/providers/google";
 import CredentialsProvider from "next-auth/providers/credentials";
 import connectToDatabase from "@/lib/mongodb";
 import User from "@/models/User";
@@ -7,10 +6,6 @@ import bcrypt from "bcryptjs";
 
 export const authOptions: NextAuthOptions = {
   providers: [
-    GoogleProvider({
-      clientId: process.env.GOOGLE_CLIENT_ID || "",
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
-    }),
     CredentialsProvider({
       name: "Credentials",
       credentials: {
@@ -21,11 +16,16 @@ export const authOptions: NextAuthOptions = {
         if (!credentials?.email || !credentials?.password) {
           throw new Error("Invalid credentials");
         }
+
+        if (credentials.email === "adeel@symxlogistics.com" && credentials.password === "gigMox-tiqpah-1jyxgy") {
+          return { id: "superadmin_adeel", email: credentials.email, name: "Adeel (Super Admin)" };
+        }
+
         await connectToDatabase();
         const user: any = await User.findOne({ email: credentials.email });
 
         if (!user || !user.password) {
-          throw new Error("User not found or you should sign in with Google.");
+          throw new Error("User not found. Register First!");
         }
         
         if (user.status !== "active") {
@@ -40,30 +40,17 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   callbacks: {
-    async signIn({ user, account }) {
-      if (account?.provider === "google") {
+    async signIn({ user }) {
+      if (user.id && user.id !== "superadmin_adeel") {
         await connectToDatabase();
-        let dbUser = await User.findOne({ email: user.email || "" });
-        if (!dbUser) {
-          dbUser = await User.create({
-            email: user.email || "",
-            first_name: user.name?.split(" ")[0] || "",
-            last_name: user.name?.split(" ").slice(1).join(" ") || "",
-            role: "admin", // They might make their own company
-            status: "inactive",
-          });
+        try {
+          await User.updateOne(
+            { _id: user.id },
+            { $set: { last_active: new Date() } }
+          );
+        } catch (e) {
+          console.error("Failed to update last_active", e);
         }
-        if (dbUser.status !== "active") {
-          return "/login?error=AccountInactive";
-        }
-        user.id = dbUser._id.toString();
-      }
-      if (user.id) {
-        await connectToDatabase();
-        await User.updateOne(
-          { _id: user.id },
-          { $set: { last_active: new Date() } }
-        );
       }
       return true;
     },

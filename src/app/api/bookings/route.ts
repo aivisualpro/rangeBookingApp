@@ -54,8 +54,9 @@ export async function POST(req: Request) {
       if (!user || !user.company_id) {
         return NextResponse.json({ error: "User has no associated company to book for" }, { status: 400 });
       }
-      companyIdStr = user.company_id._id.toString();
-      companyName = user.company_id.company_name;
+      const populatedCompany = user.company_id as any;
+      companyIdStr = populatedCompany._id.toString();
+      companyName = populatedCompany.company_name;
       userName = user.full_name;
     } else {
       companyIdStr = body.company_id || null; // allow superadmin to supply company id if needed, else omit

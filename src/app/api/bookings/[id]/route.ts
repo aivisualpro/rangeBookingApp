@@ -30,7 +30,8 @@ export async function DELETE(req: Request, context: { params?: Promise<{ id?: st
     // Auth check: superadmin or the company owning the booking
     if (userId !== "superadmin_adeel") {
        const user = await User.findById(userId).populate("company_id");
-       if (!user || !user.company_id || user.company_id._id.toString() !== booking.company_id.toString()) {
+       const populatedCompany = user?.company_id as any;
+       if (!user || !populatedCompany || populatedCompany._id.toString() !== booking.company_id.toString()) {
           return NextResponse.json({ error: "Permission denied" }, { status: 403 });
        }
     }

@@ -72,7 +72,6 @@ export const navGroups: NavGroup[] = [
   {
     label: "Infrastructure",
     items: [
-      { icon: Server, label: "Servers", href: "/servers" },
       { icon: Globe, label: "Status Page", href: "/status" },
     ],
   },

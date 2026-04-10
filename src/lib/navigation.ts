@@ -39,7 +39,6 @@ export interface NavItem {
 export const navigationItems: NavItem[] = [
   { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard, keywords: ["home", "overview"], group: "main" },
   { label: "Analytics", href: "/analytics", icon: BarChart3, keywords: ["charts", "stats", "metrics"], group: "main" },
-  { label: "Servers", href: "/servers", icon: Server, keywords: ["hosts", "machines", "instances", "fleet"], group: "main" },
   { label: "Containers", href: "/containers", icon: Container, keywords: ["docker", "pods", "kubernetes", "k8s"], group: "main" },
   { label: "Incidents", href: "/incidents", icon: AlertTriangle, badge: "2", keywords: ["alerts", "outages", "on-call", "pagerduty"], group: "main" },
   { label: "Logs", href: "/logs", icon: ScrollText, keywords: ["output", "terminal", "console", "stdout"], group: "main" },

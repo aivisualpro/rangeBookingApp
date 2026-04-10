@@ -7,10 +7,7 @@ html, body {
 }
 
 /* Enhances Dialog overlays (like modals) with a frosted glass blur effect */
-[data-state="open"].fixed.inset-0.z-50,
-.fixed.inset-0.z-50.bg-background\/80,
-.fixed.inset-0.z-50.bg-black\/50,
-.fixed.inset-0.z-50.bg-black\/80 {
+[data-slot="dialog-overlay"] {
   backdrop-filter: blur(6px) !important;
   -webkit-backdrop-filter: blur(6px) !important;
 }

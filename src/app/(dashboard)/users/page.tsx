@@ -300,8 +300,6 @@ export default function UsersPage() {
         variant="destructive"
         onConfirm={async () => {
           if (deleteUserId) {
-            const backup = [...allUsers];
-            setAllUsers(prev => prev.filter(u => u.id !== deleteUserId));
             toast.success("Deleting user in background...");
             
             try {
@@ -312,8 +310,7 @@ export default function UsersPage() {
                 throw new Error();
               }
             } catch {
-              setAllUsers(backup);
-              toast.error("Failed to delete user. Reverting...");
+              toast.error("Failed to delete user.");
             }
             setDeleteUserId(null);
           }

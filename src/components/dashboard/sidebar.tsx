@@ -61,11 +61,9 @@ export interface NavGroup {
 
 export const navGroups: NavGroup[] = [
   {
-    label: "Overview",
-    tKey: "sidebar.overview",
+    label: "",
     items: [
       { icon: LayoutDashboard, label: "Dashboard", href: "/dashboard", tKey: "sidebar.dashboard" },
-      { icon: ChartNoAxesCombined, label: "Charts", href: "/charts", tKey: "sidebar.charts" },
     ],
   },
   {
@@ -159,6 +157,21 @@ function CollapsibleGroup({
 
   // When sidebar is collapsed, show only icons (no group headers)
   if (sidebarCollapsed) {
+    return (
+      <div className="space-y-0.5">
+        {group.items.map((item) => (
+          <NavItemComponent
+            key={item.href}
+            item={item}
+            collapsed={sidebarCollapsed}
+            active={isActive(item.href)}
+          />
+        ))}
+      </div>
+    );
+  }
+
+  if (!groupLabel) {
     return (
       <div className="space-y-0.5">
         {group.items.map((item) => (

@@ -54,7 +54,6 @@ export const navigationItems: NavItem[] = [
   { label: "Setup Wizard", href: "/wizard", icon: ListChecks, keywords: ["form", "steps", "onboarding", "service"], group: "main" },
   { label: "Cloud Billing", href: "/billing", icon: CreditCard, keywords: ["payment", "subscription", "cost", "spend"], group: "main" },
   { label: "Invoices", href: "/invoices", icon: FileText, keywords: ["bills", "receipts", "statements"], group: "main" },
-  { label: "Charts", href: "/charts", icon: ChartNoAxesCombined, keywords: ["radar", "treemap", "scatter", "gauge", "graphs"], group: "main" },
   { label: "Documentation", href: "/docs", icon: BookOpen, keywords: ["docs", "guide", "help", "components"], group: "main" },
   { label: "Team", href: "/users", icon: UserCog, keywords: ["team", "members", "roles", "permissions", "rbac"], group: "system" },
   { label: "Alerts", href: "/notifications", icon: Bell, badge: "5", keywords: ["alerts", "messages", "notifications"], group: "system" },

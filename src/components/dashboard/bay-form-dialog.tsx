@@ -14,6 +14,7 @@ import { Switch } from "@dashboardpack/core/components/ui/switch";
 import { Textarea } from "@dashboardpack/core/components/ui/textarea";
 import { Label } from "@dashboardpack/core/components/ui/label";
 import { toast } from "sonner";
+import { ImageUpload } from "@/components/shared/image-upload";
 
 interface BayFormData {
   id?: string;
@@ -211,24 +212,17 @@ export function BayFormDialog({ open, onOpenChange, editBay, onSuccess }: BayFor
                  placeholder="No steel core ammo..." 
                />
             </div>
-            
-            <div className="grid grid-cols-2 gap-4">
-               <div>
-                 <Label className="mb-1 block">Primary Image URL</Label>
-                 <Input 
-                   value={formData.primary_image} 
-                   onChange={(e) => setFormData({ ...formData, primary_image: e.target.value })} 
-                   placeholder="https://..." 
-                 />
-               </div>
-               <div>
-                 <Label className="mb-1 block">Layout Diagram URL</Label>
-                 <Input 
-                   value={formData.layout_image} 
-                   onChange={(e) => setFormData({ ...formData, layout_image: e.target.value })} 
-                   placeholder="https://..." 
-                 />
-               </div>
+            <div className="grid grid-cols-2 gap-4 pt-1 border-t mt-4">
+               <ImageUpload
+                  label="Primary Image"
+                  value={formData.primary_image}
+                  onChange={(url) => setFormData({ ...formData, primary_image: url })}
+               />
+               <ImageUpload
+                  label="Layout Diagram"
+                  value={formData.layout_image}
+                  onChange={(url) => setFormData({ ...formData, layout_image: url })}
+               />
             </div>
 
             <div className="flex items-center justify-between rounded-lg border p-4">

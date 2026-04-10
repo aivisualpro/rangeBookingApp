@@ -125,8 +125,14 @@ export default function BaysPage() {
       ) : (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
           {filteredBays.map((bay) => (
-            <Card key={bay.id} className="transition-all flex flex-col hover:shadow-md hover:border-primary/20">
-              <CardHeader className="pb-3 flex-none">
+            <Card key={bay.id} className="transition-all flex flex-col hover:shadow-md hover:border-primary/20 overflow-hidden">
+              {bay.primary_image && (
+                 <div className="w-full h-36 bg-muted/50 border-b">
+                   {/* eslint-disable-next-line @next/next/no-img-element */}
+                   <img src={bay.primary_image} alt={bay.bay_name} className="w-full h-full object-cover" />
+                 </div>
+              )}
+              <CardHeader className={cn("pb-3 flex-none", bay.primary_image ? "pt-4" : "")}>
                 <div className="flex items-start justify-between">
                   <div className="flex items-center gap-2">
                     <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">

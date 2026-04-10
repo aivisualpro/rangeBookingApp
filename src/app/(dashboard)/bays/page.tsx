@@ -128,8 +128,10 @@ export default function BaysPage() {
             <Card key={bay.id} className="group relative overflow-hidden transition-all duration-300 hover:shadow-xl hover:shadow-primary/5 hover:-translate-y-1 flex flex-col border-border/60 rounded-2xl">
               <div className="relative h-48 w-full shrink-0 overflow-hidden bg-muted">
                 {bay.primary_image ? (
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={bay.primary_image} alt={bay.bay_name} className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-110" />
+                  <>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={bay.primary_image} alt={bay.bay_name} className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-110" />
+                  </>
                 ) : (
                   <div className="h-full w-full bg-gradient-to-br from-muted to-muted/50 flex items-center justify-center transition-transform duration-700 ease-out group-hover:scale-110">
                     {bay.category?.toLowerCase().includes("cowboy") ? (

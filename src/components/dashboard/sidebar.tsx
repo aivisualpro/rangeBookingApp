@@ -65,7 +65,6 @@ export const navGroups: NavGroup[] = [
     tKey: "sidebar.overview",
     items: [
       { icon: LayoutDashboard, label: "Dashboard", href: "/dashboard", tKey: "sidebar.dashboard" },
-      { icon: BarChart3, label: "Analytics", href: "/analytics", tKey: "sidebar.analytics" },
       { icon: ChartNoAxesCombined, label: "Charts", href: "/charts", tKey: "sidebar.charts" },
     ],
   },

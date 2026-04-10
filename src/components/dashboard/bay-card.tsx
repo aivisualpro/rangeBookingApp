@@ -74,17 +74,28 @@ export function BayCard({ bay, mode = "admin", isSelected, onSelect, onEdit, onD
         </div>
 
         {/* Bottom Header Info */}
-        <div className="absolute bottom-4 left-4 right-4 flex flex-col z-10">
-          <h3 className={cn("font-bold text-white leading-tight drop-shadow-md mb-1.5", isSelectMode ? "text-lg" : "text-xl")}>{bay.bay_name}</h3>
-          <div className="flex items-center gap-1.5 opacity-90">
-            <div className="flex h-5 w-5 items-center justify-center rounded-full bg-white/20 backdrop-blur-md">
-              {bay.category?.toLowerCase().includes("cowboy") ? (
-                <Crosshair className="h-3 w-3 text-amber-300" />
-              ) : (
-                <Target className="h-3 w-3 text-white" />
-              )}
-            </div>
-            <span className="text-xs font-semibold tracking-wide uppercase text-white/90 drop-shadow-sm">{bay.category || "Uncategorized"}</span>
+        <div className="absolute bottom-4 left-4 right-4 flex flex-col z-10 items-start">
+          <h3 className={cn("font-bold text-white leading-tight drop-shadow-md mb-2", isSelectMode ? "text-lg" : "text-xl")}>{bay.bay_name}</h3>
+          
+          {/* Category Chip */}
+          <div className={cn(
+            "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] sm:text-xs font-bold uppercase tracking-wider shadow-sm backdrop-blur-md",
+            bay.category?.toLowerCase().includes("cowboy") 
+              ? "bg-amber-500/90 text-white border border-amber-400/30" 
+              : bay.category?.toLowerCase().includes("pistol")
+              ? "bg-blue-500/90 text-white border border-blue-400/30"
+              : bay.category?.toLowerCase().includes("rifle")
+              ? "bg-emerald-500/90 text-white border border-emerald-400/30"
+              : bay.category?.toLowerCase().includes("tactical")
+              ? "bg-rose-500/90 text-white border border-rose-400/30"
+              : "bg-slate-600/90 text-white border border-slate-400/30"
+          )}>
+            {bay.category?.toLowerCase().includes("cowboy") ? (
+              <Crosshair className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
+            ) : (
+              <Target className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
+            )}
+            {bay.category || "Uncategorized"}
           </div>
         </div>
       </div>

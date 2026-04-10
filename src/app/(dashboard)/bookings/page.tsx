@@ -38,14 +38,12 @@ import {
 import { cn } from "@dashboardpack/core/lib/utils";
 import { toast } from "sonner";
 import {
-  getCalendarEvents,
-  addCalendarEvent,
-  deleteCalendarEvent,
   type CalendarEvent,
   type EventColor,
 } from "@dashboardpack/core/lib/data/calendar";
 import { HeaderActionsPortal } from "@/components/dashboard/header-portal";
 import { BayCard } from "@/components/dashboard/bay-card";
+import { useAPI } from "@/lib/use-api";
 
 // ── Calendar helpers ────────────────────────────────────────────────────
 
@@ -177,7 +175,6 @@ const COLOR_LABELS: { value: EventColor; label: string }[] = [
 export default function CalendarPage() {
   const [currentYear, setCurrentYear] = useState(2026);
   const [currentMonth, setCurrentMonth] = useState(1); // February = 1
-  const [events, setEvents] = useState<CalendarEvent[]>([]);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [addDialogOpen, setAddDialogOpen] = useState(false);
 
@@ -189,41 +186,23 @@ export default function CalendarPage() {
   const [formColor, setFormColor] = useState<EventColor>("primary");
   const [formDescription, setFormDescription] = useState("");
   const [formBay, setFormBay] = useState<string>("");
-  const [allowedBays, setAllowedBays] = useState<any[]>([]);
 
-  // Fetch allowed bays
-  useEffect(() => {
-    fetch("/api/bays/allowed")
-      .then(res => res.ok ? res.json() : { data: [] })
-      .then(json => setAllowedBays(json.data || []))
-      .catch(() => {});
-  }, []);
+  // SWR-powered data sources – instant on revisit, always fresh
+  const { data: allowedBays = [] } = useAPI<any[]>("/api/bays/allowed");
+  const { data: rawBookings = [], mutate: mutateBookings } = useAPI<any[]>("/api/bookings");
 
-  // Fetch bookings dynamically
-  const fetchBookings = useCallback(async () => {
-    try {
-      const res = await fetch("/api/bookings");
-      const json = await res.json();
-      if (json.data) {
-        const mappedEvents: CalendarEvent[] = json.data.map((b: any) => ({
-          id: b.id,
-          title: b.customer_notes?.split("\n")[0] || b.bay_name_snapshot,
-          date: b.booking_date,
-          time: b.start_time,
-          endTime: b.end_time,
-          color: b.status === "Approved" ? "success" : b.status === "Pending" ? "warning" : "primary",
-          description: `Company: ${b.company_name_snapshot}\nRef: ${b.reference_id}${b.customer_notes ? `\n\nNotes: ${b.customer_notes}` : ""}`
-        }));
-        setEvents(mappedEvents);
-      }
-    } catch (error) {
-      console.error("Failed to fetch bookings", error);
-    }
-  }, []);
-
-  useEffect(() => {
-    fetchBookings();
-  }, [fetchBookings]);
+  // Map raw bookings to CalendarEvent format
+  const events: CalendarEvent[] = useMemo(() => {
+    return rawBookings.map((b: any) => ({
+      id: b.id,
+      title: b.customer_notes?.split("\n")[0] || b.bay_name_snapshot,
+      date: b.booking_date,
+      time: b.start_time,
+      endTime: b.end_time,
+      color: b.status === "Approved" ? "success" : b.status === "Pending" ? "warning" : "primary",
+      description: `Company: ${b.company_name_snapshot}\nRef: ${b.reference_id}${b.customer_notes ? `\n\nNotes: ${b.customer_notes}` : ""}`
+    })) as CalendarEvent[];
+  }, [rawBookings]);
 
   // Build grid
   const calendarDays = useMemo(
@@ -319,14 +298,14 @@ export default function CalendarPage() {
         throw new Error(d.error || "Failed to create booking");
       }
 
-      await fetchBookings();
+      await mutateBookings();
       setAddDialogOpen(false);
       resetForm();
       toast.success(`Booking created successfully`);
     } catch (err: any) {
       toast.error(err.message || "Failed to create booking");
     }
-  }, [formTitle, formDate, formTime, formEndTime, formDescription, formBay, fetchBookings, resetForm]);
+  }, [formTitle, formDate, formTime, formEndTime, formDescription, formBay, mutateBookings, resetForm]);
 
   // Delete event handler
   const handleDeleteEvent = useCallback(
@@ -335,13 +314,13 @@ export default function CalendarPage() {
         const res = await fetch(`/api/bookings/${event.id}`, { method: "DELETE" });
         if (!res.ok) throw new Error("Failed to delete booking");
 
-        await fetchBookings();
+        await mutateBookings();
         toast.success(`Booking deleted`);
       } catch (err: any) {
         toast.error("An error occurred");
       }
     },
-    [fetchBookings]
+    [mutateBookings]
   );
 
   // Open add dialog with pre-filled date

@@ -13,6 +13,7 @@ import { toast } from "sonner";
 import { HeaderSearchPortal, HeaderActionsPortal } from "@/components/dashboard/header-portal";
 import { Input } from "@dashboardpack/core/components/ui/input";
 import { UserFormDialog } from "@/components/dashboard/user-form-dialog";
+import { useAPI } from "@/lib/use-api";
 
 interface UserRow {
   id: string;
@@ -89,28 +90,10 @@ const statusVariant: Record<string, "success" | "warning" | "destructive"> = {
 export default function UsersPage() {
   const router = useRouter();
   const [deleteUserId, setDeleteUserId] = useState<string | null>(null);
-  const [allUsers, setAllUsers] = useState<UserRow[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const { data: allUsers = [], isLoading, mutate } = useAPI<UserRow[]>("/api/users");
   const [globalFilter, setGlobalFilter] = useState("");
   const [formOpen, setFormOpen] = useState(false);
   const [editUser, setEditUser] = useState<any>(null);
-
-  const fetchUsers = async (silent = false) => {
-    if (!silent) setIsLoading(true);
-    try {
-      const res = await fetch("/api/users");
-      const json = await res.json();
-      if (json.data) setAllUsers(json.data);
-    } catch {
-      toast.error("Failed to fetch users");
-    } finally {
-      if (!silent) setIsLoading(false);
-    }
-  };
-
-  React.useEffect(() => {
-    fetchUsers();
-  }, []);
 
   const deleteTarget = allUsers.find((u) => u.id === deleteUserId);
 
@@ -169,7 +152,7 @@ export default function UsersPage() {
         <DataTableColumnHeader column={column} title="Status" />
       ),
       cell: ({ row }) => (
-        <StatusDropdownCell user={row.original} onUpdate={() => fetchUsers(true)} />
+        <StatusDropdownCell user={row.original} onUpdate={() => mutate()} />
       ),
       filterFn: (row, id, value) => value.includes(row.getValue(id)),
     },
@@ -276,7 +259,7 @@ export default function UsersPage() {
         <DataTable
           columns={columns}
           data={filteredData}
-          loading={isLoading}
+          loading={isLoading && allUsers.length === 0}
           exportFilename="users"
           initialColumnVisibility={{ user_type: false }}
           facetedFilters={[
@@ -305,7 +288,7 @@ export default function UsersPage() {
         open={formOpen}
         onOpenChange={setFormOpen}
         editUser={editUser}
-        onSuccess={() => fetchUsers(true)}
+        onSuccess={() => mutate()}
       />
 
       <ConfirmDialog
@@ -324,7 +307,7 @@ export default function UsersPage() {
             try {
               const res = await fetch(`/api/users/${deleteUserId}`, { method: "DELETE" });
               if (res.ok) {
-                fetchUsers(true);
+                mutate();
               } else {
                 throw new Error();
               }

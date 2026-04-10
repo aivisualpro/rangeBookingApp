@@ -1,7 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-"use client";
-
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Plus, Pencil, Trash2, Target, Crosshair, DollarSign, ListOrdered, Clock } from "lucide-react";
 import { Button } from "@dashboardpack/core/components/ui/button";
@@ -19,35 +16,16 @@ import {
   CardTitle,
 } from "@dashboardpack/core/components/ui/card";
 import { cn } from "@dashboardpack/core/lib/utils";
+import { useAPI } from "@/lib/use-api";
 
 export default function BaysPage() {
   const router = useRouter();
-  const [bays, setBays] = useState<any[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const { data: bays = [], isLoading, mutate } = useAPI<any[]>("/api/bays");
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [globalFilter, setGlobalFilter] = useState("");
   const [categoryTab, setCategoryTab] = useState<string>("All");
   const [formOpen, setFormOpen] = useState(false);
   const [editBay, setEditBay] = useState<any>(null);
-
-  const fetchBays = async () => {
-    setIsLoading(true);
-    try {
-      const res = await fetch("/api/bays");
-      const json = await res.json();
-      if (json.data) {
-        setBays(json.data);
-      }
-    } catch (err) {
-      toast.error("Failed to fetch bays");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchBays();
-  }, []);
 
   const handleDelete = async () => {
     if (!deleteId) return;
@@ -55,7 +33,7 @@ export default function BaysPage() {
       const res = await fetch(`/api/bays/${deleteId}`, { method: "DELETE" });
       if (res.ok) {
         toast.success("Bay deleted.");
-        fetchBays();
+        mutate();
       } else {
         toast.error("Failed to delete.");
       }
@@ -100,8 +78,8 @@ export default function BaysPage() {
 
 
 
-      {isLoading ? (
-        <div className="flex items-center justify-center h-48 text-muted-foreground">Loading specific bays...</div>
+      {isLoading && bays.length === 0 ? (
+        <div className="flex items-center justify-center h-48 text-muted-foreground">Loading bays...</div>
       ) : filteredBays.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-24 text-center rounded-xl border border-dashed">
           <Target className="h-8 w-8 text-muted-foreground mb-3" />
@@ -152,7 +130,7 @@ export default function BaysPage() {
         open={formOpen}
         onOpenChange={setFormOpen}
         editBay={editBay}
-        onSuccess={fetchBays}
+        onSuccess={() => mutate()}
       />
     </>
   );

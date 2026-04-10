@@ -15,6 +15,7 @@ import { Input } from "@dashboardpack/core/components/ui/input";
 import { CompanyFormDialog } from "@/components/dashboard/company-form-dialog";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@dashboardpack/core/components/ui/dialog";
 import { useNotifications } from "@/providers/notification-provider";
+import { useAPI } from "@/lib/use-api";
 
 function StatusDropdownCell({ company, onUpdate }: { company: any, onUpdate: () => void }) {
   const [internalStatus, setInternalStatus] = useState(company.status || "inactive");
@@ -76,8 +77,7 @@ function StatusDropdownCell({ company, onUpdate }: { company: any, onUpdate: () 
 
 export default function CompaniesPage() {
   const router = useRouter();
-  const [companies, setCompanies] = useState<any[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const { data: companies = [], isLoading, mutate } = useAPI<any[]>("/api/companies");
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [globalFilter, setGlobalFilter] = useState("");
   const [formOpen, setFormOpen] = useState(false);
@@ -86,30 +86,11 @@ export default function CompaniesPage() {
   const { lastEvent } = useNotifications();
   const prevEventRef = useRef(lastEvent);
 
-  const fetchCompanies = async (silent = false) => {
-    if (!silent) setIsLoading(true);
-    try {
-      const res = await fetch("/api/companies");
-      const json = await res.json();
-      if (json.data) {
-        setCompanies(json.data);
-      }
-    } catch (err) {
-      toast.error("Failed to fetch companies");
-    } finally {
-      if (!silent) setIsLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchCompanies();
-  }, []);
-
   // Live-refresh when a new company/user registration event arrives via SSE
   useEffect(() => {
     if (lastEvent && lastEvent !== prevEventRef.current && lastEvent.channel === "companies") {
       prevEventRef.current = lastEvent;
-      fetchCompanies(true);
+      mutate();
       const eventData = lastEvent.data;
       if (eventData?.event === "new_company") {
         toast.info(`New company registered: ${eventData.data?.company_name || "Unknown"}`, {
@@ -128,19 +109,17 @@ export default function CompaniesPage() {
     
     // Background optimistic deletion
     const backup = [...companies];
-    setCompanies(prev => prev.filter(c => c.id !== deleteId));
     toast.success("Deleting company in background...");
     
     try {
       const res = await fetch(`/api/companies/${deleteId}`, { method: "DELETE" });
       if (res.ok) {
-        fetchCompanies(true);
+        mutate();
       } else {
         throw new Error();
       }
     } catch (err) {
-      setCompanies(backup);
-      toast.error("Failed to delete company. Reverting...");
+      toast.error("Failed to delete company.");
     } finally {
       setDeleteId(null);
     }
@@ -192,7 +171,7 @@ export default function CompaniesPage() {
     {
       accessorKey: "status",
       header: ({ column }) => <DataTableColumnHeader column={column} title="Status" />,
-      cell: ({ row }) => <StatusDropdownCell company={row.original} onUpdate={() => fetchCompanies(true)} />
+      cell: ({ row }) => <StatusDropdownCell company={row.original} onUpdate={() => mutate()} />
     },
     {
       id: "actions",
@@ -267,7 +246,7 @@ export default function CompaniesPage() {
         open={formOpen}
         onOpenChange={setFormOpen}
         editCompany={editCompany}
-        onSuccess={() => fetchCompanies(true)}
+        onSuccess={() => mutate()}
       />
 
       <Dialog open={!!shareCompany} onOpenChange={(v) => !v && setShareCompany(null)}>

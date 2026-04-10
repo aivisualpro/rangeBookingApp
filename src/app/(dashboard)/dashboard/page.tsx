@@ -17,6 +17,82 @@ import type { ColumnDef } from "@tanstack/react-table";
 import { Calendar, Clock, AlertTriangle, ShieldX, CheckCircle, XCircle } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@dashboardpack/core/lib/utils";
+import { Treemap, ResponsiveContainer, Tooltip } from "recharts";
+import { budgetData } from "@dashboardpack/core/lib/data";
+
+function TreemapTooltip({
+  active,
+  payload,
+}: {
+  active?: boolean;
+  payload?: { payload: { name: string; size: number } }[];
+}) {
+  if (!active || !payload?.length) return null;
+  const item = payload[0].payload;
+  return (
+    <div className="rounded-lg border border-border bg-popover px-3 py-2 shadow-xl">
+      <p className="text-xs font-medium text-muted-foreground">{item.name}</p>
+      <p className="text-sm font-semibold">
+        ${(item.size / 1000).toFixed(0)}k
+      </p>
+    </div>
+  );
+}
+
+function CustomTreemapContent(props: {
+  x?: number;
+  y?: number;
+  width?: number;
+  height?: number;
+  name?: string;
+  size?: number;
+  fill?: string;
+  depth?: number;
+}) {
+  const { x = 0, y = 0, width = 0, height = 0, name, size, fill, depth } = props;
+
+  if (depth !== 1) return null;
+
+  const showLabel = width > 50 && height > 30;
+
+  return (
+    <g>
+      <rect
+        x={x}
+        y={y}
+        width={width}
+        height={height}
+        fill={fill}
+        stroke="var(--background)"
+        strokeWidth={2}
+        rx={4}
+        opacity={0.85}
+      />
+      {showLabel && (
+        <>
+          <text
+            x={x + width / 2}
+            y={y + height / 2 - 6}
+            textAnchor="middle"
+            dominantBaseline="middle"
+            className="fill-white text-xs font-medium"
+          >
+            {name}
+          </text>
+          <text
+            x={x + width / 2}
+            y={y + height / 2 + 10}
+            textAnchor="middle"
+            dominantBaseline="middle"
+            className="fill-white/70 text-[10px]"
+          >
+            ${((size ?? 0) / 1000).toFixed(0)}k
+          </text>
+        </>
+      )}
+    </g>
+  );
+}
 
 export default function DashboardPage() {
   const { data: bookings = [], isLoading: bookingsLoading, mutate: mutateBookings } = useAPI<any[]>("/api/bookings");
@@ -172,42 +248,67 @@ export default function DashboardPage() {
         </Card>
       </div>
 
-      <Card className="flex flex-col flex-1 min-h-[500px] border-border/60 rounded-2xl overflow-hidden">
-        <div className="px-6 py-5 border-b border-border/50 bg-muted/20">
-          <h2 className="text-lg font-bold tracking-tight">Recent Booking Activity</h2>
-        </div>
-        <div className="flex-1 min-h-0 flex flex-col p-4 bg-card">
-          <DataTable
-            columns={columns}
-            data={filteredBookings}
-            loading={bookingsLoading && bookings.length === 0}
-            exportFilename="recent-bookings"
-            facetedFilters={[
-              {
-                columnId: "status",
-                title: "Status",
-                options: [
-                  { label: "Pending", value: "Pending" },
-                  { label: "Approved", value: "Approved" },
-                  { label: "Denied", value: "Denied" },
-                  { label: "Cancelled", value: "Cancelled" },
-                  { label: "Completed", value: "Completed" },
-                ],
-              },
-              {
-                columnId: "company_name_snapshot",
-                title: "Company",
-                options: uniqueCompanies.map(c => ({ label: c, value: c })),
-              },
-              {
-                columnId: "bay_name_snapshot",
-                title: "Bay",
-                options: uniqueBays.map(b => ({ label: b, value: b })),
-              }
-            ]}
-          />
-        </div>
-      </Card>
+      <div className="grid grid-cols-1 xl:grid-cols-12 gap-4">
+        <Card className="xl:col-span-4 h-full">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-base font-semibold">
+              Budget Allocation
+            </CardTitle>
+            <p className="text-xs text-muted-foreground">
+              Department spending distribution
+            </p>
+          </CardHeader>
+          <CardContent className="pt-4">
+            <ResponsiveContainer width="100%" height={320}>
+              <Treemap
+                data={budgetData}
+                dataKey="size"
+                nameKey="name"
+                content={<CustomTreemapContent />}
+              >
+                <Tooltip content={<TreemapTooltip />} />
+              </Treemap>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+
+        <Card className="xl:col-span-8 flex flex-col flex-1 min-h-[500px] border-border/60 rounded-2xl overflow-hidden">
+          <div className="px-6 py-5 border-b border-border/50 bg-muted/20">
+            <h2 className="text-lg font-bold tracking-tight">Recent Booking Activity</h2>
+          </div>
+          <div className="flex-1 min-h-0 flex flex-col p-4 bg-card">
+            <DataTable
+              columns={columns}
+              data={filteredBookings}
+              loading={bookingsLoading && bookings.length === 0}
+              exportFilename="recent-bookings"
+              facetedFilters={[
+                {
+                  columnId: "status",
+                  title: "Status",
+                  options: [
+                    { label: "Pending", value: "Pending" },
+                    { label: "Approved", value: "Approved" },
+                    { label: "Denied", value: "Denied" },
+                    { label: "Cancelled", value: "Cancelled" },
+                    { label: "Completed", value: "Completed" },
+                  ],
+                },
+                {
+                  columnId: "company_name_snapshot",
+                  title: "Company",
+                  options: uniqueCompanies.map(c => ({ label: c, value: c })),
+                },
+                {
+                  columnId: "bay_name_snapshot",
+                  title: "Bay",
+                  options: uniqueBays.map(b => ({ label: b, value: b })),
+                }
+              ]}
+            />
+          </div>
+        </Card>
+      </div>
     </>
   );
 }

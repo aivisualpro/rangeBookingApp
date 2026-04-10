@@ -355,7 +355,7 @@ export default function ChartsPage() {
       <LazyChart height={400} className="mt-6">
       <div className="grid grid-cols-1 gap-4 xl:grid-cols-12">
         {/* Scatter Chart */}
-        <Card className="xl:col-span-7">
+        <Card className="xl:col-span-12">
           <CardHeader className="pb-2">
             <CardTitle className="text-base font-semibold">
               Marketing Spend vs Revenue
@@ -421,36 +421,6 @@ export default function ChartsPage() {
               </ScatterChart>
             </ResponsiveContainer>
           </CardContent>
-        </Card>
-
-        {/* Treemap */}
-        <Card className="xl:col-span-5">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-base font-semibold">
-              Budget Allocation
-            </CardTitle>
-            <p className="text-xs text-muted-foreground">
-              Department spending distribution
-            </p>
-          </CardHeader>
-          <CardContent className="pt-4">
-            <ResponsiveContainer width="100%" height={320}>
-              <Treemap
-                data={budgetData}
-                dataKey="size"
-                nameKey="name"
-                content={<CustomTreemapContent />}
-              >
-                <Tooltip content={<TreemapTooltip />} />
-              </Treemap>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
-      </div>
-
-      </LazyChart>
-
-      {/* Row 3: Composed/Mixed Chart */}
       <LazyChart height={440} className="mt-6">
         <Card>
           <CardHeader className="pb-2">

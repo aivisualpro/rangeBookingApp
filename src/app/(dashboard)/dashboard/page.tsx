@@ -307,29 +307,61 @@ export default function DashboardPage() {
         </Card>
       </div>
 
-      <div className="grid grid-cols-1 xl:grid-cols-12 gap-4">
-        <div className="xl:col-span-4 flex flex-col gap-4">
-          <Card className="flex-1">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-base font-semibold">
-                Revenue Allocation
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="pt-4">
-              <ResponsiveContainer width="100%" height={280}>
-                <Treemap
-                  data={revenueData}
-                  dataKey="size"
-                  nameKey="name"
-                  content={<CustomTreemapContent />}
-                >
-                  <Tooltip content={<TreemapTooltip />} />
-                </Treemap>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
+        <Card className="flex-1">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-base font-semibold">
+              Revenue Allocation
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="pt-4">
+            <ResponsiveContainer width="100%" height={280}>
+              <Treemap
+                data={revenueData}
+                dataKey="size"
+                nameKey="name"
+                content={<CustomTreemapContent />}
+              >
+                <Tooltip content={<TreemapTooltip />} />
+              </Treemap>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
 
-          <Card className="flex-1">
+        <Card className="flex-1 transition-all hover:shadow-md hover:border-primary/20">
+          <CardHeader className="pb-3">
+            <div className="flex items-start justify-between">
+              <div className="flex items-center gap-2">
+                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-chart-1/10">
+                  <Server className="h-4 w-4 text-chart-1" />
+                </div>
+                <div>
+                  <CardTitle className="text-sm font-semibold">prod-web-02</CardTitle>
+                  <p className="text-[11px] text-muted-foreground font-mono">10.0.1.13</p>
+                </div>
+              </div>
+              <Badge variant="success" className="text-[10px]">Online</Badge>
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <div className="flex items-center justify-between text-xs text-muted-foreground">
+              <span className="flex items-center gap-1"><Globe className="h-3 w-3" />us-east-1</span>
+              <span>Ubuntu 22.04</span>
+            </div>
+            <GaugeBar label="CPU" value={52} icon={Cpu} />
+            <GaugeBar label="Memory" value={71} icon={HardDrive} />
+            <GaugeBar label="Disk" value={35} icon={HardDrive} />
+            <div className="flex items-center gap-1 pt-1 text-[11px] text-muted-foreground">
+              <Clock className="h-3 w-3" />
+              Uptime: 14d 6h
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      <div className="grid grid-cols-1 xl:grid-cols-12 gap-4">
+        <div className="xl:col-span-4 flex flex-col gap-4 h-full">
+          <Card className="flex-1 h-full">
             <CardHeader className="pb-2">
               <CardTitle className="text-base font-semibold">
                 Team Skills Assessment
@@ -339,7 +371,7 @@ export default function DashboardPage() {
               </p>
             </CardHeader>
             <CardContent className="pt-4">
-              <ResponsiveContainer width="100%" height={280}>
+              <ResponsiveContainer width="100%" height={320}>
                 <RadarChart cx="50%" cy="50%" outerRadius="70%" data={skillsData}>
                   <PolarGrid stroke="var(--border)" strokeOpacity={0.5} />
                   <PolarAngleAxis
@@ -384,36 +416,6 @@ export default function DashboardPage() {
                   />
                 </RadarChart>
               </ResponsiveContainer>
-            </CardContent>
-          </Card>
-
-          <Card className="flex-1 transition-all hover:shadow-md hover:border-primary/20">
-            <CardHeader className="pb-3">
-              <div className="flex items-start justify-between">
-                <div className="flex items-center gap-2">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-chart-1/10">
-                    <Server className="h-4 w-4 text-chart-1" />
-                  </div>
-                  <div>
-                    <CardTitle className="text-sm font-semibold">prod-web-02</CardTitle>
-                    <p className="text-[11px] text-muted-foreground font-mono">10.0.1.13</p>
-                  </div>
-                </div>
-                <Badge variant="success" className="text-[10px]">Online</Badge>
-              </div>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <div className="flex items-center justify-between text-xs text-muted-foreground">
-                <span className="flex items-center gap-1"><Globe className="h-3 w-3" />us-east-1</span>
-                <span>Ubuntu 22.04</span>
-              </div>
-              <GaugeBar label="CPU" value={52} icon={Cpu} />
-              <GaugeBar label="Memory" value={71} icon={HardDrive} />
-              <GaugeBar label="Disk" value={35} icon={HardDrive} />
-              <div className="flex items-center gap-1 pt-1 text-[11px] text-muted-foreground">
-                <Clock className="h-3 w-3" />
-                Uptime: 14d 6h
-              </div>
             </CardContent>
           </Card>
         </div>

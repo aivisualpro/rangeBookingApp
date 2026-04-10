@@ -87,7 +87,6 @@ export const navGroups: NavGroup[] = [
     label: "Tools",
     items: [
       { icon: Kanban, label: "Task Board", href: "/kanban" },
-      { icon: Calendar, label: "Bookings", href: "/bookings" },
       { icon: ListChecks, label: "Setup Wizard", href: "/wizard" },
       { icon: CreditCard, label: "Cloud Billing", href: "/billing" },
       { icon: FileText, label: "Invoices", href: "/invoices" },
@@ -102,13 +101,12 @@ export const systemNav: NavGroup = {
     { icon: UserCog, label: "Users", href: "/users", tKey: "sidebar.users" },
     { icon: Users, label: "Companies", href: "/companies" },
     { icon: Crosshair, label: "Bays", href: "/bays" },
+    { icon: Calendar, label: "Bookings", href: "/bookings" },
     { icon: Bell, label: "Alerts", href: "/notifications", badge: "5", tKey: "sidebar.notifications" },
     { icon: Settings, label: "Settings", href: "/settings", tKey: "sidebar.settings" },
     { icon: HelpCircle, label: "Help & Support", href: "/support", tKey: "sidebar.helpSupport" },
   ],
 };
-
-
 
 function NavItemComponent({
   item,
@@ -234,6 +232,7 @@ function CollapsibleGroup({
 function SidebarContent({ collapsed }: { collapsed: boolean }) {
   const pathname = usePathname();
   const { data: session } = useSession();
+  const t = useTranslations();
 
   const isActive = (href: string) =>
     pathname === href || (href !== "/dashboard" && pathname.startsWith(href + "/"));
@@ -293,12 +292,23 @@ function SidebarContent({ collapsed }: { collapsed: boolean }) {
 
         <div className="my-2 border-t border-sidebar-border" />
 
-        <CollapsibleGroup
-          group={systemNav}
-          collapsed={collapsed}
-          isActive={isActive}
-          defaultOpen={true}
-        />
+        <div className="mb-2">
+          {!collapsed && (
+            <div className="px-3 py-1.5 text-[10px] font-semibold uppercase tracking-widest text-sidebar-foreground/30">
+              {systemNav.tKey ? t(systemNav.tKey) : systemNav.label}
+            </div>
+          )}
+          <div className="space-y-0.5">
+            {systemNav.items.map((item) => (
+              <NavItemComponent
+                key={item.href}
+                item={item}
+                collapsed={collapsed}
+                active={isActive(item.href)}
+              />
+            ))}
+          </div>
+        </div>
 
 
       </nav>

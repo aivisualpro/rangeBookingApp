@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { Crosshair, Target, DollarSign, Clock, ListOrdered, Pencil, Trash2, CheckCircle2 } from "lucide-react";
+import { Crosshair, Target, DollarSign, Clock, ListOrdered, Pencil, Trash2, CheckCircle2, Map } from "lucide-react";
 import { Card, CardContent } from "@dashboardpack/core/components/ui/card";
 import { Badge } from "@dashboardpack/core/components/ui/badge";
 import { Button } from "@dashboardpack/core/components/ui/button";
@@ -35,6 +35,7 @@ interface BayCardProps {
 export function BayCard({ bay, mode = "admin", isSelected, onSelect, onEdit, onDelete }: BayCardProps) {
   const isSelectMode = mode === "select";
   const [descOpen, setDescOpen] = useState(false);
+  const [layoutOpen, setLayoutOpen] = useState(false);
 
   return (
     <>
@@ -57,6 +58,15 @@ export function BayCard({ bay, mode = "admin", isSelected, onSelect, onEdit, onD
                 </div>
               </>
             )}
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={layoutOpen} onOpenChange={setLayoutOpen}>
+        <DialogContent className="sm:max-w-[700px] border-none bg-transparent p-0 rounded-2xl overflow-hidden shadow-2xl">
+          <div className="relative bg-black/90 p-1 flex items-center justify-center">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={bay.layout_image} alt={`${bay.bay_name} Layout Diagram`} className="max-h-[85vh] w-auto object-contain rounded-xl" />
           </div>
         </DialogContent>
       </Dialog>
@@ -148,47 +158,69 @@ export function BayCard({ bay, mode = "admin", isSelected, onSelect, onEdit, onD
           )}
 
           <div className="grid grid-cols-3 gap-2 py-1 mb-auto">
-          <div className="flex flex-col items-center justify-center rounded-xl bg-muted/40 p-2.5 text-center transition-colors group-hover:bg-primary/5 border border-transparent group-hover:border-primary/10">
-            <span className="text-[10px] uppercase tracking-wider font-semibold text-muted-foreground mb-1">Base</span>
-            <span className={cn("font-black text-foreground", isSelectMode ? "text-sm" : "text-[15px]")}>${bay.base_price || 0}</span>
+            <div className="flex flex-col items-center justify-center rounded-xl bg-muted/40 p-2.5 text-center transition-colors group-hover:bg-primary/5 border border-transparent group-hover:border-primary/10">
+              <span className="text-[10px] uppercase tracking-wider font-semibold text-muted-foreground mb-1">Base</span>
+              <span className={cn("font-black text-foreground", isSelectMode ? "text-sm" : "text-[15px]")}>${bay.base_price || 0}</span>
+            </div>
+            <div className="flex flex-col items-center justify-center rounded-xl bg-muted/40 p-2.5 text-center transition-colors group-hover:bg-primary/5 border border-transparent group-hover:border-primary/10">
+              <span className="text-[10px] uppercase tracking-wider font-semibold text-muted-foreground mb-1">Same Day</span>
+              <span className={cn("font-black text-foreground", isSelectMode ? "text-sm" : "text-[15px]")}>${bay.same_day_price || 0}</span>
+            </div>
+            <div className="flex flex-col items-center justify-center rounded-xl bg-muted/40 p-2.5 text-center transition-colors group-hover:bg-primary/5 border border-transparent group-hover:border-primary/10">
+              <span className="text-[10px] uppercase tracking-wider font-semibold text-muted-foreground mb-1">Min Fee</span>
+              <span className={cn("font-bold text-muted-foreground", isSelectMode ? "text-sm" : "text-[15px]")}>${bay.minimum_booking_fee || 0}</span>
+            </div>
           </div>
-          <div className="flex flex-col items-center justify-center rounded-xl bg-muted/40 p-2.5 text-center transition-colors group-hover:bg-primary/5 border border-transparent group-hover:border-primary/10">
-            <span className="text-[10px] uppercase tracking-wider font-semibold text-muted-foreground mb-1">Same Day</span>
-            <span className={cn("font-black text-foreground", isSelectMode ? "text-sm" : "text-[15px]")}>${bay.same_day_price || 0}</span>
-          </div>
-          <div className="flex flex-col items-center justify-center rounded-xl bg-muted/40 p-2.5 text-center transition-colors group-hover:bg-primary/5 border border-transparent group-hover:border-primary/10">
-            <span className="text-[10px] uppercase tracking-wider font-semibold text-muted-foreground mb-1">Min Fee</span>
-            <span className={cn("font-bold text-muted-foreground", isSelectMode ? "text-sm" : "text-[15px]")}>${bay.minimum_booking_fee || 0}</span>
-          </div>
-        </div>
 
-        {/* Actions Footer (Only Admin Mode) */}
-        {!isSelectMode && (
-          <div className="flex items-center gap-2 mt-5 pt-5 border-t border-border/50">
-            <Button 
-              className="flex-1 rounded-xl shadow-none h-10 bg-primary/10 text-primary hover:bg-primary hover:text-primary-foreground font-bold transition-all" 
-              onClick={(e) => { 
-                e.stopPropagation();
-                onEdit?.(bay);
-              }}
-            >
-              <Pencil className="h-4 w-4 mr-2" /> Edit Bay
-            </Button>
-            <Button 
-              variant="outline" 
-              size="icon" 
-              className="h-10 w-10 shrink-0 rounded-xl border-border/50 text-muted-foreground hover:text-destructive hover:bg-destructive/10 hover:border-destructive/20 transition-all shadow-none" 
-              onClick={(e) => {
-                e.stopPropagation();
-                onDelete?.(bay.id);
-              }}
-            >
-              <Trash2 className="h-4 w-4" />
-            </Button>
-          </div>
-        )}
-      </CardContent>
-    </Card>
+          {/* Layout Diagram (Select Mode) */}
+          {isSelectMode && bay.layout_image && (
+            <div className="mt-3">
+              <Button 
+                variant="outline" 
+                className="w-full h-8 text-[11px] font-bold uppercase tracking-wider border-border/60 hover:bg-muted"
+                onClick={(e) => { e.stopPropagation(); setLayoutOpen(true); }}
+              >
+                <Map className="h-3 w-3 mr-2 text-muted-foreground" /> Layout Diagram
+              </Button>
+            </div>
+          )}
+
+          {/* Actions Footer (Only Admin Mode) */}
+          {!isSelectMode && (
+            <div className="flex items-center gap-2 mt-5 pt-5 border-t border-border/50">
+              {bay.layout_image && (
+                <Button 
+                  variant="outline"
+                  className="rounded-xl shadow-none h-10 border-border/60 font-semibold text-muted-foreground hover:bg-muted"
+                  onClick={(e) => { e.stopPropagation(); setLayoutOpen(true); }}
+                >
+                  <Map className="h-4 w-4" />
+                </Button>
+              )}
+              <Button 
+                className="flex-1 rounded-xl shadow-none h-10 bg-primary/10 text-primary hover:bg-primary hover:text-primary-foreground font-bold transition-all" 
+                onClick={(e) => { 
+                  e.stopPropagation();
+                  onEdit?.(bay);
+                }}
+              >
+                <Pencil className="h-4 w-4 mr-2" /> Edit Bay
+              </Button>
+              <Button 
+                variant="outline" 
+                size="icon" 
+                className="h-10 w-10 shrink-0 rounded-xl border-border/50 text-muted-foreground hover:text-destructive hover:bg-destructive/10 hover:border-destructive/20 transition-all shadow-none" 
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onDelete?.(bay.id);
+                }}
+              >
+                <Trash2 className="h-4 w-4" />
+              </Button>
+            </div>
+          )}
+        </CardContent>
+      </Card>
     </>
   );
 }

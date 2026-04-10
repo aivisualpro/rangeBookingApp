@@ -48,7 +48,6 @@ export const navigationItems: NavItem[] = [
   { label: "API Monitoring", href: "/api-monitoring", icon: Radar, keywords: ["endpoints", "latency", "p99", "p95", "requests", "rpm"], group: "main" },
   { label: "Kubernetes", href: "/kubernetes", icon: Layers, keywords: ["k8s", "cluster", "nodes", "pods", "namespaces"], group: "main" },
   { label: "Cloud Costs", href: "/costs", icon: DollarSign, keywords: ["finops", "spend", "budget", "aws", "gcp", "azure"], group: "main" },
-  { label: "Status Page", href: "/status", icon: Globe, keywords: ["uptime", "incidents", "public", "operational"], group: "main" },
   { label: "Task Board", href: "/kanban", icon: Kanban, keywords: ["board", "tasks", "drag", "drop", "sprint"], group: "main" },
   { label: "Bookings", href: "/bookings", icon: Calendar, keywords: ["events", "schedule", "rotation", "range"], group: "main" },
   { label: "Setup Wizard", href: "/wizard", icon: ListChecks, keywords: ["form", "steps", "onboarding", "service"], group: "main" },

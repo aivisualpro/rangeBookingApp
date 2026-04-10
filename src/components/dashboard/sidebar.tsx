@@ -66,12 +66,6 @@ export const navGroups: NavGroup[] = [
       { icon: LayoutDashboard, label: "Dashboard", href: "/dashboard", tKey: "sidebar.dashboard" },
     ],
   },
-  {
-    label: "Infrastructure",
-    items: [
-      { icon: Globe, label: "Status Page", href: "/status" },
-    ],
-  },
 ];
 
 export const systemNav: NavGroup = {

@@ -18,8 +18,8 @@ import type { ColumnDef } from "@tanstack/react-table";
 import { Calendar, Clock, AlertTriangle, ShieldX, CheckCircle, XCircle, Server, Cpu, HardDrive, Globe, TrendingUp, Users } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@dashboardpack/core/lib/utils";
-import { Treemap, ResponsiveContainer, Tooltip, RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Legend } from "recharts";
-import { skillsData } from "@dashboardpack/core/lib/data";
+import { Treemap, ResponsiveContainer, Tooltip, RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Legend, ComposedChart, Area, Bar, Line, XAxis, YAxis, CartesianGrid } from "recharts";
+import { skillsData, comboData } from "@dashboardpack/core/lib/data";
 
 interface TooltipPayloadEntry {
   name: string;
@@ -134,6 +134,37 @@ function CustomTreemapContent(props: {
         </>
       )}
     </g>
+  );
+}
+
+function ComboTooltip({
+  active,
+  payload,
+  label,
+}: {
+  active?: boolean;
+  payload?: TooltipPayloadEntry[];
+  label?: string;
+}) {
+  if (!active || !payload?.length) return null;
+  return (
+    <div className="rounded-lg border border-border bg-popover px-3 py-2 shadow-xl">
+      <p className="mb-1 text-xs font-medium text-muted-foreground">{label}</p>
+      {payload.map((entry, i) => (
+        <p
+          key={i}
+          className="text-sm font-semibold"
+          style={{ color: entry.color }}
+        >
+          {entry.name}:{" "}
+          {entry.name === "Revenue"
+            ? `$${(entry.value / 1000).toFixed(0)}k`
+            : entry.name === "Growth %"
+              ? `${entry.value}%`
+              : entry.value}
+        </p>
+      ))}
+    </div>
   );
 }
 
@@ -471,6 +502,40 @@ export default function DashboardPage() {
               ]}
             />
           </div>
+        </Card>
+      </div>
+
+      <div className="mt-4">
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-base font-semibold">
+              Requests & Latency Trend
+            </CardTitle>
+            <p className="text-xs text-muted-foreground">
+              Combined view of requests (area), latency (bars), and growth rate (line)
+            </p>
+          </CardHeader>
+          <CardContent className="pt-4">
+            <ResponsiveContainer width="100%" height={360}>
+              <ComposedChart data={comboData}>
+                <defs>
+                  <linearGradient id="comboRevGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="var(--chart-1)" stopOpacity={0.25} />
+                    <stop offset="100%" stopColor="var(--chart-1)" stopOpacity={0} />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border)" strokeOpacity={0.5} />
+                <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fill: "var(--muted-foreground)", fontSize: 12 }} dy={8} />
+                <YAxis yAxisId="left" axisLine={false} tickLine={false} tick={{ fill: "var(--muted-foreground)", fontSize: 12 }} dx={-8} tickFormatter={(v: number) => `$${(v / 1000).toFixed(0)}k`} />
+                <YAxis yAxisId="right" orientation="right" axisLine={false} tickLine={false} tick={{ fill: "var(--muted-foreground)", fontSize: 12 }} dx={8} />
+                <Tooltip content={<ComboTooltip />} />
+                <Legend wrapperStyle={{ color: "var(--muted-foreground)", fontSize: 12 }} />
+                <Area yAxisId="left" type="monotone" dataKey="revenue" name="Revenue" stroke="var(--chart-1)" strokeWidth={2} fill="url(#comboRevGrad)" dot={false} />
+                <Bar yAxisId="right" dataKey="orders" name="Requests" fill="var(--chart-3)" radius={[4, 4, 0, 0]} maxBarSize={28} opacity={0.8} />
+                <Line yAxisId="right" type="monotone" dataKey="growth" name="Growth %" stroke="var(--chart-5)" strokeWidth={2} dot={false} strokeDasharray="5 5" />
+              </ComposedChart>
+            </ResponsiveContainer>
+          </CardContent>
         </Card>
       </div>
     </>

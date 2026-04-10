@@ -42,13 +42,7 @@ export default function NotificationsPage() {
 
   return (
     <>
-      <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight">Notifications</h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Stay up to date with your latest alerts and messages.
-          </p>
-        </div>
+      <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-end">
         {unreadCount > 0 && (
           <Button
             variant="outline"

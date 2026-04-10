@@ -189,5 +189,6 @@ export function BayCard({ bay, mode = "admin", isSelected, onSelect, onEdit, onD
         )}
       </CardContent>
     </Card>
+    </>
   );
 }

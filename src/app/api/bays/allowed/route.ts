@@ -5,7 +5,7 @@ import connectToDatabase from "@/lib/mongodb";
 import User from "@/models/User";
 import Company from "@/models/Company";
 import RangeBay from "@/models/RangeBay";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { authOptions } from "@/lib/auth";
 
 export async function GET() {
   try {

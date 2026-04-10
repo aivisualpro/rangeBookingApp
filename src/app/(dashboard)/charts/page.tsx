@@ -421,6 +421,11 @@ export default function ChartsPage() {
               </ScatterChart>
             </ResponsiveContainer>
           </CardContent>
+        </Card>
+      </div>
+      </LazyChart>
+
+      {/* Row 3: Composed/Mixed Chart */}
       <LazyChart height={440} className="mt-6">
         <Card>
           <CardHeader className="pb-2">

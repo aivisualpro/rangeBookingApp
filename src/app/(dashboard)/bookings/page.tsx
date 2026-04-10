@@ -652,7 +652,7 @@ function AddEventDialog({
   const handleBack = () => setStep(1);
 
   return (
-    <DialogContent className="sm:max-w-[600px]">
+    <DialogContent className="sm:max-w-[900px]">
       <DialogHeader>
         <DialogTitle>{step === 1 ? "Select a Bay" : "Booking Details"}</DialogTitle>
         <DialogDescription>

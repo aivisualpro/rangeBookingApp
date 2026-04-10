@@ -98,22 +98,7 @@ export default function BaysPage() {
         </Button>
       </HeaderActionsPortal>
 
-      <div className="mb-6 flex flex-wrap gap-2">
-        {categories.map((cat) => (
-          <button
-            key={cat}
-            onClick={() => setCategoryTab(cat)}
-            className={cn(
-              "rounded-lg border px-3 py-1.5 text-xs font-medium transition-all focus:outline-none",
-              categoryTab === cat 
-                ? "border-primary bg-primary/10 text-primary shadow-sm" 
-                : "border-border text-muted-foreground hover:border-primary/30"
-            )}
-          >
-            {cat} <span className="ml-1 opacity-70">({getCount(cat)})</span>
-          </button>
-        ))}
-      </div>
+
 
       {isLoading ? (
         <div className="flex items-center justify-center h-48 text-muted-foreground">Loading specific bays...</div>

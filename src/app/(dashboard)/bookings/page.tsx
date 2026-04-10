@@ -45,6 +45,7 @@ import {
   type EventColor,
 } from "@dashboardpack/core/lib/data/calendar";
 import { HeaderActionsPortal } from "@/components/dashboard/header-portal";
+import { BayCard } from "@/components/dashboard/bay-card";
 
 // ── Calendar helpers ────────────────────────────────────────────────────
 
@@ -670,67 +671,15 @@ function AddEventDialog({
                  <p className="text-xs text-muted-foreground mt-1">Your company has not been assigned any active bays yet.</p>
                </div>
             ) : (
-               <div className="grid grid-cols-2 gap-3 max-h-[400px] overflow-y-auto pr-2 pb-2">
+               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 max-h-[500px] overflow-y-auto pr-2 pb-2">
                  {allowedBays.map(bay => (
-                   <button
-                     key={bay.id}
-                     type="button"
-                     onClick={() => setFormBay(bay.id)}
-                     className={`flex flex-col text-left transition-all rounded-xl border relative overflow-hidden focus:outline-none ${
-                       formBay === bay.id 
-                         ? "ring-2 ring-primary border-primary bg-primary/5 shadow-md" 
-                         : "hover:border-primary/50 hover:bg-muted/30 hover:shadow-sm"
-                     }`}
-                   >
-                     {/* Card Header area */}
-                     <div className="p-3 pb-2 flex-none w-full border-b border-border/40">
-                       <div className="flex items-start justify-between w-full">
-                         <div className="flex items-center gap-2">
-                           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 shrink-0">
-                             {bay.category?.toLowerCase().includes("cowboy") ? (
-                               <Crosshair className="h-4 w-4 text-amber-600" />
-                             ) : (
-                               <Target className="h-4 w-4 text-primary" />
-                             )}
-                           </div>
-                           <div className="min-w-0">
-                             <p className={`text-sm font-semibold truncate ${formBay === bay.id ? "text-primary" : "text-foreground"}`}>
-                               {bay.bay_name}
-                             </p>
-                             <p className="text-[11px] text-muted-foreground font-medium truncate">
-                               {bay.category || "Uncategorized"}
-                             </p>
-                           </div>
-                         </div>
-                         <Badge variant={bay.status === 'Active' ? 'success' : 'secondary'} className="text-[10px] shrink-0 ml-2">
-                           {bay.status || "Active"}
-                         </Badge>
-                       </div>
-                     </div>
-                     {/* Card Content area with metrics */}
-                     <div className="p-3 pt-2 flex-1 flex flex-col justify-between w-full bg-background/50">
-                       <div className="grid grid-cols-2 gap-y-2 gap-x-2 bg-muted/30 p-2 rounded-lg border border-border/50">
-                         <div className="space-y-0.5">
-                           <span className="flex items-center gap-1 text-[9px] uppercase font-bold text-muted-foreground">
-                             <DollarSign className="h-2.5 w-2.5" /> Base
-                           </span>
-                           <p className="text-sm font-bold text-foreground">${bay.base_price || 0}</p>
-                         </div>
-                         <div className="space-y-0.5">
-                           <span className="flex items-center gap-1 text-[9px] uppercase font-bold text-muted-foreground">
-                             <Clock className="h-2.5 w-2.5" /> Same Day
-                           </span>
-                           <p className="text-sm font-bold text-foreground">${bay.same_day_price || 0}</p>
-                         </div>
-                         <div className="space-y-0.5 col-span-2">
-                           <span className="flex items-center gap-1 text-[9px] uppercase font-bold text-muted-foreground">
-                             <ListOrdered className="h-2.5 w-2.5" /> Min. Fee
-                           </span>
-                           <p className="text-sm font-medium text-muted-foreground">${bay.minimum_booking_fee || 0}</p>
-                         </div>
-                       </div>
-                     </div>
-                   </button>
+                   <BayCard 
+                     key={bay.id} 
+                     bay={bay} 
+                     mode="select"
+                     isSelected={formBay === bay.id}
+                     onSelect={(b) => setFormBay(b.id)}
+                   />
                  ))}
                </div>
             )}

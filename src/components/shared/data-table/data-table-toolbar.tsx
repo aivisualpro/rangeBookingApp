@@ -21,8 +21,6 @@ interface FacetedFilterConfig {
 
 interface DataTableToolbarProps<TData> {
   table: Table<TData>;
-  searchPlaceholder?: string;
-  exportFilename?: string;
   facetedFilters?: FacetedFilterConfig[];
   bulkActions?: (selectedRows: TData[]) => React.ReactNode;
 }
@@ -30,7 +28,6 @@ interface DataTableToolbarProps<TData> {
 export function DataTableToolbar<TData>({
   table,
   searchPlaceholder = "Search...",
-  exportFilename,
   facetedFilters,
   bulkActions,
 }: DataTableToolbarProps<TData>) {
@@ -38,42 +35,6 @@ export function DataTableToolbar<TData>({
   const activeFilterCount = table.getState().columnFilters.length;
   const isFiltered = activeFilterCount > 0;
 
-  const handleExport = () => {
-    const visibleColumns = table
-      .getAllLeafColumns()
-      .filter(
-        (col) =>
-          col.getIsVisible() && col.id !== "select" && col.id !== "actions"
-      );
-
-    const header = visibleColumns
-      .map((col) => {
-        const headerValue = col.columnDef.header;
-        return typeof headerValue === "string" ? headerValue : col.id;
-      })
-      .join(",");
-
-    const rows = table.getFilteredRowModel().rows.map((row) =>
-      visibleColumns
-        .map((col) => {
-          const val = row.getValue(col.id);
-          const str = val != null ? String(val) : "";
-          return str.includes(",") || str.includes('"')
-            ? `"${str.replace(/"/g, '""')}"`
-            : str;
-        })
-        .join(",")
-    );
-
-    const csv = [header, ...rows].join("\n");
-    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = `${exportFilename || "export"}.csv`;
-    link.click();
-    URL.revokeObjectURL(url);
-  };
 
   return (
     <div className="flex items-center justify-between gap-2">
@@ -146,18 +107,6 @@ export function DataTableToolbar<TData>({
               </div>
             </PopoverContent>
           </Popover>
-        )}
-
-        {exportFilename && (
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleExport}
-            className="gap-1.5 h-9 shrink-0"
-          >
-            <Download className="size-4" />
-            <span className="hidden sm:inline">Export</span>
-          </Button>
         )}
       </HeaderActionsPortal>
     </div>

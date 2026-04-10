@@ -260,7 +260,6 @@ export default function UsersPage() {
           columns={columns}
           data={filteredData}
           loading={isLoading && allUsers.length === 0}
-          exportFilename="users"
           initialColumnVisibility={{ user_type: false }}
           facetedFilters={[
             {

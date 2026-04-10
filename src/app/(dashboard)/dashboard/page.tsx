@@ -585,7 +585,6 @@ export default function DashboardPage() {
               columns={columns}
               data={filteredBookings}
               loading={bookingsLoading && bookings.length === 0}
-              exportFilename="recent-bookings"
               facetedFilters={[
                 {
                   columnId: "status",

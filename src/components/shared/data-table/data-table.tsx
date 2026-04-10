@@ -46,7 +46,6 @@ interface DataTableProps<TData, TValue> {
   enableRowSelection?: boolean;
   onRowClick?: (row: TData) => void;
   perPageOptions?: number[];
-  exportFilename?: string;
   emptyMessage?: string;
   bulkActions?: (selectedRows: TData[]) => React.ReactNode;
   facetedFilters?: FacetedFilterConfig[];
@@ -61,7 +60,6 @@ export function DataTable<TData, TValue>({
   enableRowSelection = false,
   onRowClick,
   perPageOptions,
-  exportFilename,
   emptyMessage = "No results found.",
   bulkActions,
   facetedFilters,
@@ -113,7 +111,6 @@ export function DataTable<TData, TValue>({
       <DataTableToolbar
         table={table}
         searchPlaceholder={searchPlaceholder}
-        exportFilename={exportFilename}
         facetedFilters={facetedFilters}
         bulkActions={bulkActions}
       />

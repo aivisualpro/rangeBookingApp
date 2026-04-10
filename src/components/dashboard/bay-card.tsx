@@ -64,6 +64,9 @@ export function BayCard({ bay, mode = "admin", isSelected, onSelect, onEdit, onD
 
       <Dialog open={layoutOpen} onOpenChange={setLayoutOpen}>
         <DialogContent className="sm:max-w-[700px] border-none bg-transparent p-0 rounded-2xl overflow-hidden shadow-2xl">
+          <DialogHeader className="sr-only">
+            <DialogTitle>{bay.bay_name} Layout Diagram</DialogTitle>
+          </DialogHeader>
           <div className="relative bg-black/90 p-1 flex items-center justify-center">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={bay.layout_image} alt={`${bay.bay_name} Layout Diagram`} className="max-h-[85vh] w-auto object-contain rounded-xl" />

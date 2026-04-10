@@ -123,81 +123,89 @@ export default function BaysPage() {
           <p className="text-xs text-muted-foreground mt-1">Adjust your filters or add a new bay.</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {filteredBays.map((bay) => (
-            <Card key={bay.id} className="transition-all flex flex-col hover:shadow-md hover:border-primary/20 overflow-hidden">
-              {bay.primary_image && (
-                 <div className="w-full h-36 bg-muted/50 border-b">
-                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                   <img src={bay.primary_image} alt={bay.bay_name} className="w-full h-full object-cover" />
-                 </div>
-              )}
-              <CardHeader className={cn("pb-3 flex-none", bay.primary_image ? "pt-4" : "")}>
-                <div className="flex items-start justify-between">
-                  <div className="flex items-center gap-2">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
-                      {bay.category?.toLowerCase().includes("cowboy") ? (
-                        <Crosshair className="h-5 w-5 text-amber-600" />
-                      ) : (
-                        <Target className="h-5 w-5 text-primary" />
-                      )}
-                    </div>
-                    <div>
-                      <CardTitle className="text-sm font-semibold">{bay.bay_name}</CardTitle>
-                      <p className="text-[11px] text-muted-foreground font-medium">{bay.category || "Uncategorized"}</p>
-                    </div>
+            <Card key={bay.id} className="group relative overflow-hidden transition-all duration-300 hover:shadow-xl hover:shadow-primary/5 hover:-translate-y-1 flex flex-col border-border/60 rounded-2xl">
+              <div className="relative h-48 w-full shrink-0 overflow-hidden bg-muted">
+                {bay.primary_image ? (
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={bay.primary_image} alt={bay.bay_name} className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-110" />
+                ) : (
+                  <div className="h-full w-full bg-gradient-to-br from-muted to-muted/50 flex items-center justify-center transition-transform duration-700 ease-out group-hover:scale-110">
+                    {bay.category?.toLowerCase().includes("cowboy") ? (
+                      <Crosshair className="h-16 w-16 text-muted-foreground/15" />
+                    ) : (
+                      <Target className="h-16 w-16 text-muted-foreground/15" />
+                    )}
                   </div>
-                  <Badge variant={bay.status === 'Active' ? 'success' : 'secondary'} className="text-[10px]">
+                )}
+                
+                {/* Gradient overlay */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent transition-opacity duration-300 group-hover:opacity-90" />
+                
+                {/* Top actions/badges */}
+                <div className="absolute top-3 right-3 flex items-center gap-2">
+                  <Badge variant={bay.status === 'Active' ? 'success' : 'secondary'} className={cn("shadow-sm font-semibold tracking-wide backdrop-blur-md border-transparent", bay.status === 'Active' ? "bg-success/90 text-success-foreground" : "bg-background/80 text-foreground")}>
                     {bay.status || "Active"}
                   </Badge>
                 </div>
-              </CardHeader>
-              <CardContent className="space-y-4 flex-1 flex flex-col justify-between">
-                <div>
-                  <div className="grid grid-cols-2 gap-y-3 gap-x-2 bg-muted/30 p-3 rounded-lg border">
-                    <div className="space-y-1">
-                      <span className="flex items-center gap-1 text-[10px] uppercase font-bold text-muted-foreground">
-                        <DollarSign className="h-3 w-3" /> Base
-                      </span>
-                      <p className="text-sm font-bold">${bay.base_price || 0}</p>
+
+                {/* Bottom Header Info */}
+                <div className="absolute bottom-4 left-4 right-4 flex flex-col">
+                  <h3 className="text-xl font-bold text-white leading-tight drop-shadow-md mb-1.5">{bay.bay_name}</h3>
+                  <div className="flex items-center gap-1.5 opacity-90">
+                    <div className="flex h-5 w-5 items-center justify-center rounded-full bg-white/20 backdrop-blur-md">
+                      {bay.category?.toLowerCase().includes("cowboy") ? (
+                        <Crosshair className="h-3 w-3 text-amber-300" />
+                      ) : (
+                        <Target className="h-3 w-3 text-white" />
+                      )}
                     </div>
-                    <div className="space-y-1">
-                      <span className="flex items-center gap-1 text-[10px] uppercase font-bold text-muted-foreground">
-                        <Clock className="h-3 w-3" /> Same Day
-                      </span>
-                      <p className="text-sm font-bold">${bay.same_day_price || 0}</p>
-                    </div>
-                    <div className="space-y-1">
-                      <span className="flex items-center gap-1 text-[10px] uppercase font-bold text-muted-foreground">
-                        <ListOrdered className="h-3 w-3" /> Min. Fee
-                      </span>
-                      <p className="text-sm font-medium text-muted-foreground">${bay.minimum_booking_fee || 0}</p>
-                    </div>
+                    <span className="text-xs font-semibold tracking-wide uppercase text-white/90 drop-shadow-sm">{bay.category || "Uncategorized"}</span>
+                  </div>
+                </div>
+              </div>
+
+              <CardContent className="flex flex-1 flex-col p-5 bg-card">
+                <div className="grid grid-cols-3 gap-2 py-1 mb-auto">
+                  <div className="flex flex-col items-center justify-center rounded-xl bg-muted/40 p-2.5 text-center transition-colors group-hover:bg-primary/5 border border-transparent group-hover:border-primary/10">
+                    <span className="text-[10px] uppercase tracking-wider font-semibold text-muted-foreground mb-1">Base</span>
+                    <span className="text-[15px] font-black text-foreground">${bay.base_price || 0}</span>
+                  </div>
+                  <div className="flex flex-col items-center justify-center rounded-xl bg-muted/40 p-2.5 text-center transition-colors group-hover:bg-primary/5 border border-transparent group-hover:border-primary/10">
+                    <span className="text-[10px] uppercase tracking-wider font-semibold text-muted-foreground mb-1">Same Day</span>
+                    <span className="text-[15px] font-black text-foreground">${bay.same_day_price || 0}</span>
+                  </div>
+                  <div className="flex flex-col items-center justify-center rounded-xl bg-muted/40 p-2.5 text-center transition-colors group-hover:bg-primary/5 border border-transparent group-hover:border-primary/10">
+                    <span className="text-[10px] uppercase tracking-wider font-semibold text-muted-foreground mb-1">Min Fee</span>
+                    <span className="text-[15px] font-bold text-muted-foreground">${bay.minimum_booking_fee || 0}</span>
                   </div>
                 </div>
 
                 {/* Actions Footer */}
-                <div className="flex items-center gap-2 justify-end pt-2 mt-auto border-t border-border/50">
-                  <Button variant="outline" size="sm" className="h-8 text-xs px-2 shadow-none" onClick={() => { 
-                    setEditBay({
-                      id: bay.id,
-                      bay_name: bay.bay_name,
-                      category: bay.category,
-                      description: bay.description,
-                      primary_image: bay.primary_image,
-                      layout_image: bay.layout_image,
-                      rules: bay.rules,
-                      base_price: bay.base_price,
-                      same_day_price: bay.same_day_price,
-                      minimum_booking_fee: bay.minimum_booking_fee,
-                      per_person_rate: bay.per_person_rate,
-                      status: bay.status,
-                    });
-                    setFormOpen(true);
+                <div className="flex items-center gap-2 mt-5 pt-5 border-t border-border/50">
+                  <Button 
+                    className="flex-1 rounded-xl shadow-none h-10 bg-primary/10 text-primary hover:bg-primary hover:text-primary-foreground font-bold transition-all" 
+                    onClick={() => { 
+                      setEditBay({
+                        id: bay.id,
+                        bay_name: bay.bay_name,
+                        category: bay.category,
+                        description: bay.description,
+                        primary_image: bay.primary_image,
+                        layout_image: bay.layout_image,
+                        rules: bay.rules,
+                        base_price: bay.base_price,
+                        same_day_price: bay.same_day_price,
+                        minimum_booking_fee: bay.minimum_booking_fee,
+                        per_person_rate: bay.per_person_rate,
+                        status: bay.status,
+                      });
+                      setFormOpen(true);
                   }}>
-                    <Pencil className="h-3.5 w-3.5 mr-1.5" /> Edit
+                    <Pencil className="h-4 w-4 mr-2" /> Edit Bay
                   </Button>
-                  <Button variant="outline" size="sm" className="h-8 w-8 p-0 text-destructive shadow-none hover:text-destructive hover:bg-destructive/10 border-transparent" onClick={() => setDeleteId(bay.id)}>
+                  <Button variant="outline" size="icon" className="h-10 w-10 shrink-0 rounded-xl border-border/50 text-muted-foreground hover:text-destructive hover:bg-destructive/10 hover:border-destructive/20 transition-all shadow-none" onClick={() => setDeleteId(bay.id)}>
                     <Trash2 className="h-4 w-4" />
                   </Button>
                 </div>

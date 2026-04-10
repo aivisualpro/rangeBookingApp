@@ -2,6 +2,7 @@ import NextAuth, { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import connectToDatabase from "@/lib/mongodb";
 import User from "@/models/User";
+import "@/models/Company"; // Required: registers Company schema for populate("company_id")
 import bcrypt from "bcryptjs";
 
 export const authOptions: NextAuthOptions = {

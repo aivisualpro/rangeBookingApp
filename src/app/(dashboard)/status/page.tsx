@@ -134,51 +134,6 @@ export default function StatusPage() {
         </CardContent>
       </Card>
 
-      {/* Service Grid */}
-      <Card className="mb-6">
-        <CardHeader>
-          <CardTitle className="text-base font-semibold">Services</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            {services.map((svc) => {
-              const stat = statusConfig[svc.status];
-              const StatusIcon = stat.icon;
-              return (
-                <div key={svc.name} className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <StatusIcon className={cn("h-4 w-4", stat.color)} />
-                      <span className="text-sm font-medium">{svc.name}</span>
-                    </div>
-                    <div className="flex items-center gap-4">
-                      <span className="text-xs text-muted-foreground flex items-center gap-1">
-                        <Activity className="h-3 w-3" />{svc.latency}
-                      </span>
-                      <span className="text-xs font-mono font-semibold">{svc.uptime}</span>
-                    </div>
-                  </div>
-                  {/* 90-day uptime bar */}
-                  <div className="flex gap-[2px]">
-                    {svc.days.map((day, i) => (
-                      <div
-                        key={i}
-                        className={cn("h-6 flex-1 rounded-[1px] transition-colors", dayColors[day])}
-                        title={`Day ${90 - i}: ${day}`}
-                      />
-                    ))}
-                  </div>
-                  <div className="flex justify-between text-[10px] text-muted-foreground">
-                    <span>90 days ago</span>
-                    <span>Today</span>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </CardContent>
-      </Card>
-
       {/* Recent Incidents */}
       <Card>
         <CardHeader>

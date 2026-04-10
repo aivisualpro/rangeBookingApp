@@ -23,41 +23,45 @@ import {
   DropdownMenuTrigger,
 } from "@dashboardpack/core/components/ui/dropdown-menu";
 import {
-  Search,
   Sun,
   Moon,
   Bell,
-  Plus,
   Menu,
   Palette,
   Terminal,
   Rocket,
-  AlertTriangle,
+  Building2,
   Users,
   Settings,
   LogOut,
   CheckCheck,
+  CalendarCheck,
 } from "lucide-react";
-import {
-  getNotifications,
-  getUnreadCount,
-  markAsRead,
-  markAllAsRead,
-} from "@dashboardpack/core/lib/data";
-import type { NotificationType } from "@dashboardpack/core/lib/data";
 import { cn } from "@dashboardpack/core/lib/utils";
 import { toast } from "sonner";
 import { useTranslations } from "@dashboardpack/core/lib/i18n/locale-context";
+import { useNotifications, type NotificationType } from "@/providers/notification-provider";
+import { signOut, useSession } from "next-auth/react";
 
 const notificationIcon: Record<
   NotificationType,
   { icon: React.ElementType; color: string; bg: string }
 > = {
-  order: { icon: Rocket, color: "text-chart-1", bg: "bg-chart-1/10" },
-  payment: { icon: AlertTriangle, color: "text-chart-2", bg: "bg-chart-2/10" },
-  customer: { icon: Users, color: "text-chart-3", bg: "bg-chart-3/10" },
+  registration: { icon: Users, color: "text-chart-3", bg: "bg-chart-3/10" },
+  company: { icon: Building2, color: "text-chart-1", bg: "bg-chart-1/10" },
+  booking: { icon: CalendarCheck, color: "text-chart-2", bg: "bg-chart-2/10" },
   system: { icon: Settings, color: "text-chart-4", bg: "bg-chart-4/10" },
 };
+
+function timeAgo(dateStr: string) {
+  const now = new Date();
+  const date = new Date(dateStr);
+  const diff = Math.floor((now.getTime() - date.getTime()) / 1000);
+  if (diff < 60) return "Just now";
+  if (diff < 3600) return `${Math.floor(diff / 60)} min ago`;
+  if (diff < 86400) return `${Math.floor(diff / 3600)} hour${Math.floor(diff / 3600) > 1 ? "s" : ""} ago`;
+  return `${Math.floor(diff / 86400)} day${Math.floor(diff / 86400) > 1 ? "s" : ""} ago`;
+}
 
 export function Header() {
   const { theme, setTheme } = useTheme();
@@ -65,13 +69,17 @@ export function Header() {
   const router = useRouter();
   const pathname = usePathname();
   const t = useTranslations();
+  const { data: session } = useSession();
   const [notifOpen, setNotifOpen] = useState(false);
   const [customizerOpen, setCustomizerOpen] = useState(false);
-  const [, forceUpdate] = useState(0);
-  const refresh = () => forceUpdate((n) => n + 1);
 
-  const unreadCount = getUnreadCount();
-  const recentNotifications = getNotifications().slice(0, 5);
+  const { notifications, unreadCount, markAsRead, markAllAsRead } = useNotifications();
+  const recentNotifications = notifications.slice(0, 5);
+
+  // Session-derived user info
+  const userName = session?.user?.name || "User";
+  const userEmail = session?.user?.email || "";
+  const userInitials = userName.split(" ").map((w: string) => w[0]).join("").toUpperCase().slice(0, 2);
 
   const getRouteTitle = () => {
     if (!pathname || pathname === "/" || pathname === "/dashboard") return "Dashboard";
@@ -154,7 +162,7 @@ export function Header() {
             >
               <Bell className="h-4 w-4" />
               {unreadCount > 0 && (
-                <span className="absolute ltr:right-1.5 rtl:left-1.5 top-1.5 h-2 w-2 rounded-full bg-destructive" />
+                <span className="absolute ltr:right-1.5 rtl:left-1.5 top-1.5 h-2 w-2 rounded-full bg-destructive animate-pulse" />
               )}
             </button>
           </PopoverTrigger>
@@ -170,10 +178,7 @@ export function Header() {
               </div>
               {unreadCount > 0 && (
                 <button
-                  onClick={() => {
-                    markAllAsRead();
-                    refresh();
-                  }}
+                  onClick={() => markAllAsRead()}
                   className="flex items-center gap-1 text-xs text-muted-foreground transition-colors hover:text-foreground"
                 >
                   <CheckCheck className="h-3 w-3" />
@@ -188,7 +193,7 @@ export function Header() {
                 </p>
               ) : (
                 recentNotifications.map((notif) => {
-                  const typeInfo = notificationIcon[notif.type];
+                  const typeInfo = notificationIcon[notif.type] || notificationIcon.system;
                   const Icon = typeInfo.icon;
                   return (
                     <button
@@ -198,12 +203,10 @@ export function Header() {
                         !notif.read && "bg-primary/5"
                       )}
                       onClick={() => {
-                        if (!notif.read) {
-                          markAsRead(notif.id);
-                          refresh();
-                        }
+                        if (!notif.read) markAsRead(notif.id);
                         setNotifOpen(false);
-                        router.push("/notifications");
+                        if (notif.link) router.push(notif.link);
+                        else router.push("/notifications");
                       }}
                     >
                       <div
@@ -227,7 +230,7 @@ export function Header() {
                           {notif.description}
                         </p>
                         <p className="mt-1 text-[10px] text-muted-foreground/60">
-                          {notif.time}
+                          {timeAgo(notif.time)}
                         </p>
                       </div>
                       {!notif.read && (
@@ -257,17 +260,17 @@ export function Header() {
               aria-label="User menu"
               className="ms-1 flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-xs font-semibold text-primary transition-colors hover:bg-primary/20"
             >
-              AS
+              {userInitials}
             </button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-48" sideOffset={8}>
             <DropdownMenuLabel className="font-normal">
-              <p className="text-sm font-medium">Aigars S.</p>
-              <p className="text-xs text-muted-foreground">aigars@example.com</p>
+              <p className="text-sm font-medium">{userName}</p>
+              <p className="text-xs text-muted-foreground">{userEmail}</p>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuItem onClick={() => router.push("/settings")}>
+              <DropdownMenuItem onClick={() => router.push("/profile")}>
                 <Settings className="me-2 h-4 w-4" />
                 {t("header.settings")}
               </DropdownMenuItem>
@@ -283,10 +286,8 @@ export function Header() {
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuItem
-              onClick={() => {
-                toast.success(t("header.loggedOut"), {
-                  description: t("header.signedOutMessage"),
-                });
+              onClick={async () => {
+                await signOut({ redirect: true, callbackUrl: "/login" });
               }}
             >
               <LogOut className="me-2 h-4 w-4" />

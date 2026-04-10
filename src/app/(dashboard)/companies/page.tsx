@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import type { ColumnDef } from "@tanstack/react-table";
 import { Plus, Pencil, Trash2, Share2, Copy } from "lucide-react";
@@ -14,6 +14,7 @@ import { HeaderSearchPortal, HeaderActionsPortal } from "@/components/dashboard/
 import { Input } from "@dashboardpack/core/components/ui/input";
 import { CompanyFormDialog } from "@/components/dashboard/company-form-dialog";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@dashboardpack/core/components/ui/dialog";
+import { useNotifications } from "@/providers/notification-provider";
 
 function StatusDropdownCell({ company, onUpdate }: { company: any, onUpdate: () => void }) {
   const [internalStatus, setInternalStatus] = useState(company.status || "inactive");
@@ -82,6 +83,8 @@ export default function CompaniesPage() {
   const [formOpen, setFormOpen] = useState(false);
   const [editCompany, setEditCompany] = useState<any>(null);
   const [shareCompany, setShareCompany] = useState<any>(null);
+  const { lastEvent } = useNotifications();
+  const prevEventRef = useRef(lastEvent);
 
   const fetchCompanies = async (silent = false) => {
     if (!silent) setIsLoading(true);
@@ -101,6 +104,24 @@ export default function CompaniesPage() {
   useEffect(() => {
     fetchCompanies();
   }, []);
+
+  // Live-refresh when a new company/user registration event arrives via SSE
+  useEffect(() => {
+    if (lastEvent && lastEvent !== prevEventRef.current && lastEvent.channel === "companies") {
+      prevEventRef.current = lastEvent;
+      fetchCompanies(true);
+      const eventData = lastEvent.data;
+      if (eventData?.event === "new_company") {
+        toast.info(`New company registered: ${eventData.data?.company_name || "Unknown"}`, {
+          description: "Table refreshed automatically.",
+        });
+      } else if (eventData?.event === "company_updated") {
+        toast.info(`Company updated: ${eventData.data?.company_name || "Unknown"}`, {
+          description: "A new user joined this company.",
+        });
+      }
+    }
+  }, [lastEvent]);
 
   const handleDelete = async () => {
     if (!deleteId) return;

@@ -4,28 +4,41 @@ import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@dashboardpack/core/components/ui/card";
 import { Button } from "@dashboardpack/core/components/ui/button";
 import { Badge } from "@dashboardpack/core/components/ui/badge";
-import { Bell, Rocket, AlertTriangle, Users, Settings, CheckCheck } from "lucide-react";
-import { getNotifications, markAsRead, markAllAsRead, getUnreadCount } from "@dashboardpack/core/lib/data";
-import type { NotificationType } from "@dashboardpack/core/lib/data";
+import { Bell, Building2, Users, Settings, CheckCheck, CalendarCheck, Loader2 } from "lucide-react";
 import { cn } from "@dashboardpack/core/lib/utils";
+import { useNotifications, type NotificationType } from "@/providers/notification-provider";
+import { useRouter } from "next/navigation";
 
 const filters = ["all", "unread", "read"] as const;
 type Filter = (typeof filters)[number];
 
 const typeIcon: Record<NotificationType, { icon: React.ElementType; color: string; bg: string }> = {
-  order: { icon: Rocket, color: "text-chart-1", bg: "bg-chart-1/10" },
-  payment: { icon: AlertTriangle, color: "text-chart-2", bg: "bg-chart-2/10" },
-  customer: { icon: Users, color: "text-chart-3", bg: "bg-chart-3/10" },
+  registration: { icon: Users, color: "text-chart-3", bg: "bg-chart-3/10" },
+  company: { icon: Building2, color: "text-chart-1", bg: "bg-chart-1/10" },
+  booking: { icon: CalendarCheck, color: "text-chart-2", bg: "bg-chart-2/10" },
   system: { icon: Settings, color: "text-chart-4", bg: "bg-chart-4/10" },
 };
 
+function timeAgo(dateStr: string) {
+  const now = new Date();
+  const date = new Date(dateStr);
+  const diff = Math.floor((now.getTime() - date.getTime()) / 1000);
+  if (diff < 60) return "Just now";
+  if (diff < 3600) return `${Math.floor(diff / 60)} min ago`;
+  if (diff < 86400) return `${Math.floor(diff / 3600)} hour${Math.floor(diff / 3600) > 1 ? "s" : ""} ago`;
+  return `${Math.floor(diff / 86400)} day${Math.floor(diff / 86400) > 1 ? "s" : ""} ago`;
+}
+
 export default function NotificationsPage() {
   const [filter, setFilter] = useState<Filter>("all");
-  const [, forceUpdate] = useState(0);
-  const refresh = () => forceUpdate((n) => n + 1);
+  const router = useRouter();
+  const { notifications, unreadCount, loading, markAsRead, markAllAsRead } = useNotifications();
 
-  const notifications = getNotifications(filter);
-  const unreadCount = getUnreadCount();
+  const filtered = filter === "all"
+    ? notifications
+    : filter === "unread"
+      ? notifications.filter((n) => !n.read)
+      : notifications.filter((n) => n.read);
 
   return (
     <>
@@ -41,10 +54,7 @@ export default function NotificationsPage() {
             variant="outline"
             size="sm"
             className="gap-1.5"
-            onClick={() => {
-              markAllAsRead();
-              refresh();
-            }}
+            onClick={() => markAllAsRead()}
           >
             <CheckCheck className="h-4 w-4" />
             Mark all as read
@@ -78,7 +88,12 @@ export default function NotificationsPage() {
           </div>
         </CardHeader>
         <CardContent>
-          {notifications.length === 0 ? (
+          {loading ? (
+            <div className="flex flex-col items-center justify-center py-12 text-center">
+              <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+              <p className="mt-4 text-sm text-muted-foreground">Loading notifications…</p>
+            </div>
+          ) : filtered.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-12 text-center">
               <div className="rounded-full bg-muted p-4">
                 <Bell className="h-8 w-8 text-muted-foreground" />
@@ -90,8 +105,8 @@ export default function NotificationsPage() {
             </div>
           ) : (
             <div className="space-y-0">
-              {notifications.map((notif) => {
-                const { icon: Icon, color, bg } = typeIcon[notif.type];
+              {filtered.map((notif) => {
+                const { icon: Icon, color, bg } = typeIcon[notif.type] || typeIcon.system;
                 return (
                   <div
                     key={notif.id}
@@ -100,10 +115,8 @@ export default function NotificationsPage() {
                       !notif.read && "bg-primary/[0.03]"
                     )}
                     onClick={() => {
-                      if (!notif.read) {
-                        markAsRead(notif.id);
-                        refresh();
-                      }
+                      if (!notif.read) markAsRead(notif.id);
+                      if (notif.link) router.push(notif.link);
                     }}
                   >
                     <div className={cn("mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg", bg)}>
@@ -119,7 +132,7 @@ export default function NotificationsPage() {
                         )}
                       </div>
                       <p className="text-xs text-muted-foreground leading-snug">{notif.description}</p>
-                      <p className="text-[11px] text-muted-foreground/60">{notif.time}</p>
+                      <p className="text-[11px] text-muted-foreground/60">{timeAgo(notif.time)}</p>
                     </div>
                   </div>
                 );

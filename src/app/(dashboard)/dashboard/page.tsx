@@ -119,11 +119,6 @@ export default function DashboardPage() {
         />
       </HeaderSearchPortal>
 
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold tracking-tight">Dashboard Overview</h1>
-        <p className="mt-1 text-sm text-muted-foreground">Keep track of your daily operations, approvals, and COI statuses.</p>
-      </div>
-
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         <Card className="hover:border-primary/50 transition-colors">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
@@ -180,7 +175,6 @@ export default function DashboardPage() {
       <Card className="flex flex-col flex-1 min-h-[500px] border-border/60 rounded-2xl overflow-hidden">
         <div className="px-6 py-5 border-b border-border/50 bg-muted/20">
           <h2 className="text-lg font-bold tracking-tight">Recent Booking Activity</h2>
-          <p className="text-xs text-muted-foreground">Your platform's latest requests, cancellations, and completed sessions.</p>
         </div>
         <div className="flex-1 min-h-0 flex flex-col p-4 bg-card">
           <DataTable

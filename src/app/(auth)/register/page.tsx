@@ -246,9 +246,9 @@ function RegisterForm() {
   return (
     <>
       <title>Create Account — Signal Dashboard</title>
-      <Card className={`w-full mx-auto shadow-xl transition-all animate-in fade-in slide-in-from-right-4 duration-500 ${currentStepView === "Company" ? "max-w-4xl" : "max-w-xl"}`}>
+      <Card className={`w-[95%] sm:w-full mx-auto shadow-xl transition-all animate-in fade-in slide-in-from-right-4 duration-500 ${currentStepView === "Company" ? "max-w-4xl" : "max-w-xl"}`}>
         <CardHeader className="text-center pb-2">
-          <CardTitle className="text-3xl font-bold">
+          <CardTitle className="text-2xl sm:text-3xl font-bold">
             Create your account
             {invitedCompanyName && (
               <span className="block text-xl text-primary font-medium mt-1">
@@ -260,7 +260,7 @@ function RegisterForm() {
             Step {step} of {totalSteps}
           </CardDescription>
           
-          <div className="flex justify-center items-center gap-2 mt-4 px-10">
+          <div className="flex justify-center items-center gap-2 mt-4 px-4 sm:px-10">
              <div className="h-2 flex-1 rounded-full bg-primary transition-all duration-500"></div>
              <div className={`h-2 flex-1 rounded-full transition-all duration-500 ${step >= 2 ? 'bg-primary' : 'bg-muted'}`}></div>
              {hasCompanyStep && (
@@ -284,7 +284,7 @@ function RegisterForm() {
                       variant={userType === "Internal" ? "default" : "outline"} 
                       onClick={() => setUserType("Internal")}
                       disabled={isTokenLocked}
-                      className="font-medium"
+                      className="font-medium text-xs sm:text-sm h-auto py-2"
                     >
                       Internal Staff
                     </Button>
@@ -293,7 +293,7 @@ function RegisterForm() {
                       variant={userType === "External" ? "default" : "outline"} 
                       onClick={() => setUserType("External")}
                       disabled={isTokenLocked}
-                      className="font-medium"
+                      className="font-medium text-xs sm:text-sm h-auto py-2"
                     >
                       External User
                     </Button>
@@ -310,7 +310,7 @@ function RegisterForm() {
                         variant={externalMode === "new_company" ? "default" : "outline"} 
                         onClick={() => setExternalMode("new_company")}
                         disabled={isTokenLocked}
-                        className="font-medium h-auto py-2"
+                        className="font-medium text-xs sm:text-sm h-auto py-2 whitespace-normal leading-snug"
                       >
                         Register a new company
                       </Button>
@@ -319,7 +319,7 @@ function RegisterForm() {
                         variant={externalMode === "existing_company" ? "default" : "outline"} 
                         onClick={() => setExternalMode("existing_company")}
                         disabled={isTokenLocked}
-                        className="font-medium h-auto py-2"
+                        className="font-medium text-xs sm:text-sm h-auto py-2 whitespace-normal leading-snug"
                       >
                         Part of a company
                       </Button>
@@ -350,7 +350,7 @@ function RegisterForm() {
 
             {/* STEP 2: Company Details */}
             {currentStepView === "Company" && (
-               <div className="space-y-4 p-4 border rounded-lg bg-card animate-in fade-in slide-in-from-right-4 duration-500">
+               <div className="space-y-4 p-3 sm:p-4 border rounded-lg bg-card animate-in fade-in slide-in-from-right-4 duration-500">
                  <h3 className="font-bold text-lg border-b pb-2">Company Details</h3>
                  
                  <div className="grid grid-cols-3 gap-3">
@@ -472,7 +472,7 @@ function RegisterForm() {
                       autoComplete="email"
                     />
                   </div>
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div className="space-y-2">
                        <div className="flex items-center justify-between">
                          <Label htmlFor="password">Password *</Label>
@@ -561,7 +561,7 @@ function RegisterForm() {
             </p>
           </CardContent>
 
-          <CardFooter className="flex justify-between border-t p-6 !pt-6 bg-muted/10 rounded-b-xl">
+          <CardFooter className="flex justify-between gap-3 border-t p-4 sm:p-6 !pt-4 sm:!pt-6 bg-muted/10 rounded-b-xl">
              <Button 
                 type="button" 
                 variant="outline" 

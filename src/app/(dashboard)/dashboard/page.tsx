@@ -11,10 +11,11 @@ import {
 import { Badge } from "@dashboardpack/core/components/ui/badge";
 import { Button } from "@dashboardpack/core/components/ui/button";
 import { Input } from "@dashboardpack/core/components/ui/input";
+import { Progress } from "@dashboardpack/core/components/ui/progress";
 import { DataTable, DataTableColumnHeader } from "@/components/shared/data-table";
 import { HeaderSearchPortal } from "@/components/dashboard/header-portal";
 import type { ColumnDef } from "@tanstack/react-table";
-import { Calendar, Clock, AlertTriangle, ShieldX, CheckCircle, XCircle } from "lucide-react";
+import { Calendar, Clock, AlertTriangle, ShieldX, CheckCircle, XCircle, Server, Cpu, HardDrive, Globe } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@dashboardpack/core/lib/utils";
 import { Treemap, ResponsiveContainer, Tooltip, RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Legend } from "recharts";
@@ -133,6 +134,22 @@ function CustomTreemapContent(props: {
         </>
       )}
     </g>
+  );
+}
+
+function GaugeBar({ label, value, icon: Icon }: { label: string; value: number; icon: React.ElementType }) {
+  const color = value > 85 ? "text-destructive" : value > 70 ? "text-warning" : "text-muted-foreground";
+  return (
+    <div className="space-y-1">
+      <div className="flex items-center justify-between text-xs">
+        <span className="flex items-center gap-1 text-muted-foreground">
+          <Icon className="h-3 w-3" />
+          {label}
+        </span>
+        <span className={cn("font-semibold", color)}>{value}%</span>
+      </div>
+      <Progress value={value} className="h-1.5" />
+    </div>
   );
 }
 
@@ -367,6 +384,36 @@ export default function DashboardPage() {
                   />
                 </RadarChart>
               </ResponsiveContainer>
+            </CardContent>
+          </Card>
+
+          <Card className="flex-1 transition-all hover:shadow-md hover:border-primary/20">
+            <CardHeader className="pb-3">
+              <div className="flex items-start justify-between">
+                <div className="flex items-center gap-2">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-chart-1/10">
+                    <Server className="h-4 w-4 text-chart-1" />
+                  </div>
+                  <div>
+                    <CardTitle className="text-sm font-semibold">prod-web-02</CardTitle>
+                    <p className="text-[11px] text-muted-foreground font-mono">10.0.1.13</p>
+                  </div>
+                </div>
+                <Badge variant="success" className="text-[10px]">Online</Badge>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <div className="flex items-center justify-between text-xs text-muted-foreground">
+                <span className="flex items-center gap-1"><Globe className="h-3 w-3" />us-east-1</span>
+                <span>Ubuntu 22.04</span>
+              </div>
+              <GaugeBar label="CPU" value={52} icon={Cpu} />
+              <GaugeBar label="Memory" value={71} icon={HardDrive} />
+              <GaugeBar label="Disk" value={35} icon={HardDrive} />
+              <div className="flex items-center gap-1 pt-1 text-[11px] text-muted-foreground">
+                <Clock className="h-3 w-3" />
+                Uptime: 14d 6h
+              </div>
             </CardContent>
           </Card>
         </div>

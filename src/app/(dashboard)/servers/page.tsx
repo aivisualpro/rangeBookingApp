@@ -14,7 +14,6 @@ import { Server, Cpu, HardDrive, Globe, Clock } from "lucide-react";
 
 const servers = [
   { name: "prod-web-01", status: "online" as const, region: "us-east-1", os: "Ubuntu 22.04", cpu: 45, memory: 68, disk: 32, uptime: "14d 6h", ip: "10.0.1.12" },
-  { name: "prod-web-02", status: "online" as const, region: "us-east-1", os: "Ubuntu 22.04", cpu: 52, memory: 71, disk: 35, uptime: "14d 6h", ip: "10.0.1.13" },
   { name: "prod-api-01", status: "online" as const, region: "us-west-2", os: "Amazon Linux 2023", cpu: 78, memory: 82, disk: 45, uptime: "7d 12h", ip: "10.0.2.20" },
   { name: "prod-api-02", status: "degraded" as const, region: "us-west-2", os: "Amazon Linux 2023", cpu: 92, memory: 88, disk: 47, uptime: "7d 12h", ip: "10.0.2.21" },
   { name: "prod-db-01", status: "online" as const, region: "us-east-1", os: "Ubuntu 22.04", cpu: 35, memory: 90, disk: 72, uptime: "30d 2h", ip: "10.0.1.50" },

@@ -17,7 +17,41 @@ import type { ColumnDef } from "@tanstack/react-table";
 import { Calendar, Clock, AlertTriangle, ShieldX, CheckCircle, XCircle } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@dashboardpack/core/lib/utils";
-import { Treemap, ResponsiveContainer, Tooltip } from "recharts";
+import { Treemap, ResponsiveContainer, Tooltip, RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Legend } from "recharts";
+import { skillsData } from "@dashboardpack/core/lib/data";
+
+interface TooltipPayloadEntry {
+  name: string;
+  value: number;
+  color: string;
+  unit?: string;
+}
+
+function ChartTooltip({
+  active,
+  payload,
+  label,
+}: {
+  active?: boolean;
+  payload?: TooltipPayloadEntry[];
+  label?: string;
+}) {
+  if (!active || !payload?.length) return null;
+  return (
+    <div className="rounded-lg border border-border bg-popover px-3 py-2 shadow-xl">
+      <p className="mb-1 text-xs font-medium text-muted-foreground">{label}</p>
+      {payload.map((entry, i) => (
+        <p
+          key={i}
+          className="text-sm font-semibold"
+          style={{ color: entry.color }}
+        >
+          {entry.name}: {entry.value}
+        </p>
+      ))}
+    </div>
+  );
+}
 
 const revenueData = [
   { name: "Bay 1 (Marksman)", size: 420000, fill: "var(--chart-1)" },
@@ -257,25 +291,85 @@ export default function DashboardPage() {
       </div>
 
       <div className="grid grid-cols-1 xl:grid-cols-12 gap-4">
-        <Card className="xl:col-span-4 h-full">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-base font-semibold">
-              Revenue Allocation
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="pt-4">
-            <ResponsiveContainer width="100%" height={320}>
-              <Treemap
-                data={revenueData}
-                dataKey="size"
-                nameKey="name"
-                content={<CustomTreemapContent />}
-              >
-                <Tooltip content={<TreemapTooltip />} />
-              </Treemap>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
+        <div className="xl:col-span-4 flex flex-col gap-4">
+          <Card className="flex-1">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-base font-semibold">
+                Revenue Allocation
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="pt-4">
+              <ResponsiveContainer width="100%" height={280}>
+                <Treemap
+                  data={revenueData}
+                  dataKey="size"
+                  nameKey="name"
+                  content={<CustomTreemapContent />}
+                >
+                  <Tooltip content={<TreemapTooltip />} />
+                </Treemap>
+              </ResponsiveContainer>
+            </CardContent>
+          </Card>
+
+          <Card className="flex-1">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-base font-semibold">
+                Team Skills Assessment
+              </CardTitle>
+              <p className="text-xs text-muted-foreground">
+                Current vs previous quarter competencies
+              </p>
+            </CardHeader>
+            <CardContent className="pt-4">
+              <ResponsiveContainer width="100%" height={280}>
+                <RadarChart cx="50%" cy="50%" outerRadius="70%" data={skillsData}>
+                  <PolarGrid stroke="var(--border)" strokeOpacity={0.5} />
+                  <PolarAngleAxis
+                    dataKey="subject"
+                    tick={{
+                      fill: "var(--muted-foreground)",
+                      fontSize: 10,
+                    }}
+                  />
+                  <PolarRadiusAxis
+                    angle={30}
+                    domain={[0, 100]}
+                    tick={{
+                      fill: "var(--muted-foreground)",
+                      fontSize: 10,
+                    }}
+                    axisLine={false}
+                    tickLine={false}
+                  />
+                  <Radar
+                    name="Current"
+                    dataKey="current"
+                    stroke="var(--chart-1)"
+                    fill="var(--chart-1)"
+                    fillOpacity={0.25}
+                    strokeWidth={2}
+                  />
+                  <Radar
+                    name="Previous"
+                    dataKey="previous"
+                    stroke="var(--chart-3)"
+                    fill="var(--chart-3)"
+                    fillOpacity={0.1}
+                    strokeDasharray="5 5"
+                  />
+                  <Tooltip content={<ChartTooltip />} />
+                  <Legend
+                    wrapperStyle={{
+                      color: "var(--muted-foreground)",
+                      fontSize: 10,
+                    }}
+                  />
+                </RadarChart>
+              </ResponsiveContainer>
+            </CardContent>
+          </Card>
+        </div>
 
         <Card className="xl:col-span-8 flex flex-col flex-1 min-h-[500px] border-border/60 rounded-2xl overflow-hidden">
           <div className="px-6 py-5 border-b border-border/50 bg-muted/20">

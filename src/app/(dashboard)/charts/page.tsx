@@ -216,69 +216,10 @@ export default function ChartsPage() {
         </p>
       </div>
 
-      {/* Row 1: Radar + Radial Bar */}
-      <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
-        {/* Radar Chart */}
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-base font-semibold">
-              Team Skills Assessment
-            </CardTitle>
-            <p className="text-xs text-muted-foreground">
-              Current vs previous quarter competencies
-            </p>
-          </CardHeader>
-          <CardContent className="pt-4">
-            <ResponsiveContainer width="100%" height={320}>
-              <RadarChart cx="50%" cy="50%" outerRadius="75%" data={skillsData}>
-                <PolarGrid stroke="var(--border)" strokeOpacity={0.5} />
-                <PolarAngleAxis
-                  dataKey="subject"
-                  tick={{
-                    fill: "var(--muted-foreground)",
-                    fontSize: 12,
-                  }}
-                />
-                <PolarRadiusAxis
-                  angle={30}
-                  domain={[0, 100]}
-                  tick={{
-                    fill: "var(--muted-foreground)",
-                    fontSize: 10,
-                  }}
-                  axisLine={false}
-                  tickLine={false}
-                />
-                <Radar
-                  name="Current"
-                  dataKey="current"
-                  stroke="var(--chart-1)"
-                  fill="var(--chart-1)"
-                  fillOpacity={0.25}
-                  strokeWidth={2}
-                />
-                <Radar
-                  name="Previous"
-                  dataKey="previous"
-                  stroke="var(--chart-3)"
-                  fill="var(--chart-3)"
-                  fillOpacity={0.1}
-                  strokeDasharray="5 5"
-                />
-                <Tooltip content={<ChartTooltip />} />
-                <Legend
-                  wrapperStyle={{
-                    color: "var(--muted-foreground)",
-                    fontSize: 12,
-                  }}
-                />
-              </RadarChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
-
+      {/* Row 1: Radial Bar Chart only */}
+      <div className="grid grid-cols-1 gap-4 xl:grid-cols-12">
         {/* Radial Bar Chart */}
-        <Card>
+        <Card className="xl:col-span-12">
           <CardHeader className="pb-2">
             <CardTitle className="text-base font-semibold">
               Device Usage

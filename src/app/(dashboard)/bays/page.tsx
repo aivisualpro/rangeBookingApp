@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+"use client";
+
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Plus, Pencil, Trash2, Target, Crosshair, DollarSign, ListOrdered, Clock } from "lucide-react";

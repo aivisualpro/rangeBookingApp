@@ -87,9 +87,6 @@ export const navGroups: NavGroup[] = [
     label: "Tools",
     items: [
       { icon: Kanban, label: "Task Board", href: "/kanban" },
-      { icon: ListChecks, label: "Setup Wizard", href: "/wizard" },
-      { icon: CreditCard, label: "Cloud Billing", href: "/billing" },
-      { icon: FileText, label: "Invoices", href: "/invoices" },
     ],
   },
 ];
@@ -293,11 +290,6 @@ function SidebarContent({ collapsed }: { collapsed: boolean }) {
         <div className="my-2 border-t border-sidebar-border" />
 
         <div className="mb-2">
-          {!collapsed && (
-            <div className="px-3 py-1.5 text-[10px] font-semibold uppercase tracking-widest text-sidebar-foreground/30">
-              {systemNav.tKey ? t(systemNav.tKey) : systemNav.label}
-            </div>
-          )}
           <div className="space-y-0.5">
             {systemNav.items.map((item) => (
               <NavItemComponent

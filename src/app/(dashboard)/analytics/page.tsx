@@ -36,7 +36,6 @@ function daysAgo(days: number): Date {
 
 const metricsData = [
   { title: "Page Views", value: "284,392", change: 24.7, icon: Eye, color: "text-chart-1", bg: "bg-chart-1/10" },
-  { title: "Unique Visitors", value: "42,847", change: 12.3, icon: Users, color: "text-chart-2", bg: "bg-chart-2/10" },
   { title: "Bounce Rate", value: "32.4%", change: -5.2, icon: MousePointer, color: "text-chart-3", bg: "bg-chart-3/10" },
   { title: "Avg. Session", value: "4m 32s", change: 8.1, icon: Clock, color: "text-chart-4", bg: "bg-chart-4/10" },
 ];

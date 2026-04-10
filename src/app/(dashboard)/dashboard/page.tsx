@@ -15,7 +15,7 @@ import { Progress } from "@dashboardpack/core/components/ui/progress";
 import { DataTable, DataTableColumnHeader } from "@/components/shared/data-table";
 import { HeaderSearchPortal } from "@/components/dashboard/header-portal";
 import type { ColumnDef } from "@tanstack/react-table";
-import { Calendar, Clock, AlertTriangle, ShieldX, CheckCircle, XCircle, Server, Cpu, HardDrive, Globe } from "lucide-react";
+import { Calendar, Clock, AlertTriangle, ShieldX, CheckCircle, XCircle, Server, Cpu, HardDrive, Globe, TrendingUp, Users } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@dashboardpack/core/lib/utils";
 import { Treemap, ResponsiveContainer, Tooltip, RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Legend } from "recharts";
@@ -254,7 +254,7 @@ export default function DashboardPage() {
         />
       </HeaderSearchPortal>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
         <Card className="hover:border-primary/50 transition-colors">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">Today's Bookings</CardTitle>
@@ -303,6 +303,22 @@ export default function DashboardPage() {
           <CardContent>
             <div className="text-3xl font-black text-destructive">{companiesLoading ? "..." : expiredCois}</div>
             <p className="text-[10px] text-muted-foreground uppercase tracking-wider mt-1">Needs Renewal</p>
+          </CardContent>
+        </Card>
+
+        <Card className="hover:border-primary/50 transition-colors">
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">Unique Visitors</CardTitle>
+            <div className="h-8 w-8 rounded-full bg-chart-2/10 flex items-center justify-center">
+              <Users className="h-4 w-4 text-chart-2" />
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="text-3xl font-black">42,847</div>
+            <div className="flex items-center gap-1 mt-1">
+              <TrendingUp className="h-3 w-3 text-success" />
+              <span className="text-[10px] font-semibold text-success tracking-wider">+12.3% this month</span>
+            </div>
           </CardContent>
         </Card>
       </div>

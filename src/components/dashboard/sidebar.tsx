@@ -83,12 +83,6 @@ export const navGroups: NavGroup[] = [
       { icon: ScrollText, label: "Logs", href: "/logs" },
     ],
   },
-  {
-    label: "Tools",
-    items: [
-      { icon: Kanban, label: "Task Board", href: "/kanban" },
-    ],
-  },
 ];
 
 export const systemNav: NavGroup = {

@@ -18,8 +18,8 @@ import type { ColumnDef } from "@tanstack/react-table";
 import { Calendar, Clock, AlertTriangle, ShieldX, CheckCircle, XCircle, Server, Cpu, HardDrive, Globe, TrendingUp, Users } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@dashboardpack/core/lib/utils";
-import { Treemap, ResponsiveContainer, Tooltip, RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Legend, ComposedChart, Area, Bar, Line, XAxis, YAxis, CartesianGrid } from "recharts";
-import { skillsData, comboData } from "@dashboardpack/core/lib/data";
+import { Treemap, ResponsiveContainer, Tooltip, RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Legend, ComposedChart, Area, Bar, Line, XAxis, YAxis, CartesianGrid, RadialBarChart, RadialBar } from "recharts";
+import { skillsData, comboData, deviceUsageData } from "@dashboardpack/core/lib/data";
 
 interface TooltipPayloadEntry {
   name: string;
@@ -463,6 +463,78 @@ export default function DashboardPage() {
                   />
                 </RadarChart>
               </ResponsiveContainer>
+            </CardContent>
+          </Card>
+
+          <Card className="flex-1 h-full">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-base font-semibold">
+                Device Usage
+              </CardTitle>
+              <p className="text-xs text-muted-foreground">
+                Session distribution by device type
+              </p>
+            </CardHeader>
+            <CardContent className="pt-4">
+              <div className="flex flex-col items-center gap-4">
+                <div className="h-52 w-52">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <RadialBarChart
+                      cx="50%"
+                      cy="50%"
+                      innerRadius="25%"
+                      outerRadius="90%"
+                      data={deviceUsageData}
+                      startAngle={90}
+                      endAngle={-270}
+                    >
+                      <RadialBar
+                        dataKey="value"
+                        background={{ fill: "var(--muted)", opacity: 0.3 }}
+                        cornerRadius={6}
+                      />
+                      <Tooltip
+                        content={({ active, payload }) => {
+                          if (!active || !payload?.length) return null;
+                          const item = payload[0].payload as {
+                            name: string;
+                            value: number;
+                          };
+                          return (
+                            <div className="rounded-lg border border-border bg-popover px-3 py-2 shadow-xl">
+                              <p className="text-xs font-medium text-muted-foreground">
+                                {item.name}
+                              </p>
+                              <p className="text-sm font-semibold">
+                                {item.value}%
+                              </p>
+                            </div>
+                          );
+                        }}
+                      />
+                    </RadialBarChart>
+                  </ResponsiveContainer>
+                </div>
+                <div className="w-full space-y-3">
+                  {deviceUsageData.map((item) => (
+                    <div
+                      key={item.name}
+                      className="flex items-center justify-between"
+                    >
+                      <div className="flex items-center gap-2">
+                        <div
+                          className="h-2.5 w-2.5 rounded-full"
+                          style={{ backgroundColor: item.fill }}
+                        />
+                        <span className="text-xs text-muted-foreground">
+                          {item.name}
+                        </span>
+                      </div>
+                      <span className="text-xs font-semibold">{item.value}%</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </CardContent>
           </Card>
         </div>

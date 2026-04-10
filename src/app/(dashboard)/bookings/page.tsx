@@ -177,7 +177,7 @@ const COLOR_LABELS: { value: EventColor; label: string }[] = [
 export default function CalendarPage() {
   const [currentYear, setCurrentYear] = useState(2026);
   const [currentMonth, setCurrentMonth] = useState(1); // February = 1
-  const [events, setEvents] = useState<CalendarEvent[]>(getCalendarEvents);
+  const [events, setEvents] = useState<CalendarEvent[]>([]);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [addDialogOpen, setAddDialogOpen] = useState(false);
 
@@ -191,13 +191,39 @@ export default function CalendarPage() {
   const [formBay, setFormBay] = useState<string>("");
   const [allowedBays, setAllowedBays] = useState<any[]>([]);
 
-  // Fetch allowed bays on load
+  // Fetch allowed bays
   useEffect(() => {
     fetch("/api/bays/allowed")
       .then(res => res.ok ? res.json() : { data: [] })
       .then(json => setAllowedBays(json.data || []))
       .catch(() => {});
   }, []);
+
+  // Fetch bookings dynamically
+  const fetchBookings = useCallback(async () => {
+    try {
+      const res = await fetch("/api/bookings");
+      const json = await res.json();
+      if (json.data) {
+        const mappedEvents: CalendarEvent[] = json.data.map((b: any) => ({
+          id: b.id,
+          title: b.customer_notes?.split("\n")[0] || b.bay_name_snapshot,
+          date: b.booking_date,
+          time: b.start_time,
+          endTime: b.end_time,
+          color: b.status === "Approved" ? "success" : b.status === "Pending" ? "warning" : "primary",
+          description: `Company: ${b.company_name_snapshot}\nRef: ${b.reference_id}${b.customer_notes ? `\n\nNotes: ${b.customer_notes}` : ""}`
+        }));
+        setEvents(mappedEvents);
+      }
+    } catch (error) {
+      console.error("Failed to fetch bookings", error);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchBookings();
+  }, [fetchBookings]);
 
   // Build grid
   const calendarDays = useMemo(
@@ -270,32 +296,52 @@ export default function CalendarPage() {
   }, []);
 
   // Add event handler
-  const handleAddEvent = useCallback(() => {
-    if (!formTitle.trim() || !formDate) return;
+  const handleAddEvent = useCallback(async () => {
+    if (!formTitle.trim() || !formDate || !formBay) return;
 
-    const newEvent = addCalendarEvent({
-      title: formTitle.trim(),
-      date: formDate,
-      time: formTime || undefined,
-      endTime: formEndTime || undefined,
-      color: formColor,
-      description: formDescription.trim() ? `${formDescription.trim()}\n\nBay Booking: ${allowedBays.find(b => b.id === formBay)?.bay_name || formBay}` : (formBay ? `Bay Booking: ${allowedBays.find(b => b.id === formBay)?.bay_name || formBay}` : undefined),
-    });
+    try {
+      const payload = {
+        bay_id: formBay,
+        booking_date: formDate,
+        start_time: formTime,
+        end_time: formEndTime,
+        customer_notes: `${formTitle.trim()}\n${formDescription.trim()}`
+      };
 
-    setEvents(getCalendarEvents());
-    setAddDialogOpen(false);
-    resetForm();
-    toast.success(`Event "${newEvent.title}" created`);
-  }, [formTitle, formDate, formTime, formEndTime, formColor, formDescription, resetForm]);
+      const res = await fetch("/api/bookings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      if (!res.ok) {
+        const d = await res.json();
+        throw new Error(d.error || "Failed to create booking");
+      }
+
+      await fetchBookings();
+      setAddDialogOpen(false);
+      resetForm();
+      toast.success(`Booking created successfully`);
+    } catch (err: any) {
+      toast.error(err.message || "Failed to create booking");
+    }
+  }, [formTitle, formDate, formTime, formEndTime, formDescription, formBay, fetchBookings, resetForm]);
 
   // Delete event handler
   const handleDeleteEvent = useCallback(
-    (event: CalendarEvent) => {
-      deleteCalendarEvent(event.id);
-      setEvents(getCalendarEvents());
-      toast.success(`Event "${event.title}" deleted`);
+    async (event: CalendarEvent) => {
+      try {
+        const res = await fetch(`/api/bookings/${event.id}`, { method: "DELETE" });
+        if (!res.ok) throw new Error("Failed to delete booking");
+
+        await fetchBookings();
+        toast.success(`Booking deleted`);
+      } catch (err: any) {
+        toast.error("An error occurred");
+      }
     },
-    []
+    [fetchBookings]
   );
 
   // Open add dialog with pre-filled date

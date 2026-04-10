@@ -5,15 +5,14 @@ import connectToDatabase from "@/lib/mongodb";
 import Booking from "@/models/Booking";
 import User from "@/models/User";
 
-export async function DELETE(req: Request, context: { params?: Promise<{ id?: string }> | { id?: string } }) {
+export async function DELETE(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const session = await getServerSession(authOptions);
     if (!session || !session.user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const resolvedParams = await context.params;
-    const { id } = resolvedParams || {};
+    const { id } = await params;
 
     if (!id) {
       return NextResponse.json({ error: "Booking ID is required" }, { status: 400 });

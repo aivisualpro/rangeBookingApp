@@ -76,12 +76,6 @@ export const navGroups: NavGroup[] = [
       { icon: Globe, label: "Status Page", href: "/status" },
     ],
   },
-  {
-    label: "Operations",
-    items: [
-      { icon: ScrollText, label: "Logs", href: "/logs" },
-    ],
-  },
 ];
 
 export const systemNav: NavGroup = {
@@ -92,6 +86,7 @@ export const systemNav: NavGroup = {
     { icon: Users, label: "Companies", href: "/companies" },
     { icon: Crosshair, label: "Bays", href: "/bays" },
     { icon: Calendar, label: "Bookings", href: "/bookings" },
+    { icon: ScrollText, label: "Logs", href: "/logs" },
     { icon: Bell, label: "Alerts", href: "/notifications", badge: "5", tKey: "sidebar.notifications" },
     { icon: Settings, label: "Settings", href: "/settings", tKey: "sidebar.settings" },
     { icon: HelpCircle, label: "Help & Support", href: "/support", tKey: "sidebar.helpSupport" },

@@ -251,9 +251,6 @@ function SidebarContent({ collapsed }: { collapsed: boolean }) {
             <span className="text-sm font-bold tracking-tight text-sidebar-foreground">
               Range Booking App
             </span>
-            <span className="text-[10px] font-medium uppercase tracking-widest text-sidebar-foreground/40">
-              Dashboard
-            </span>
           </div>
         )}
       </div>

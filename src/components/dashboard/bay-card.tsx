@@ -67,19 +67,21 @@ export function BayCard({ bay, mode = "admin", isSelected, onSelect, onEdit, onD
         <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent transition-opacity duration-300 group-hover:opacity-90" />
         
         {/* Top actions/badges */}
-        <div className="absolute top-3 right-3 flex items-center gap-2 z-10">
-          <Badge variant={bay.status === 'Active' ? 'success' : 'secondary'} className={cn("shadow-sm font-semibold tracking-wide backdrop-blur-md border-transparent", bay.status === 'Active' ? "bg-success/90 text-success-foreground" : "bg-background/80 text-foreground")}>
-            {bay.status || "Active"}
-          </Badge>
-        </div>
+        {!isSelectMode && (
+          <div className="absolute top-3 right-3 flex items-center gap-2 z-10">
+            <Badge variant={bay.status === 'Active' ? 'success' : 'secondary'} className={cn("shadow-sm font-semibold tracking-wide backdrop-blur-md border-transparent", bay.status === 'Active' ? "bg-success/90 text-success-foreground" : "bg-background/80 text-foreground")}>
+              {bay.status || "Active"}
+            </Badge>
+          </div>
+        )}
 
         {/* Bottom Header Info */}
-        <div className="absolute bottom-4 left-4 right-4 flex flex-col z-10 items-start">
-          <h3 className={cn("font-bold text-white leading-tight drop-shadow-md mb-2", isSelectMode ? "text-lg" : "text-xl")}>{bay.bay_name}</h3>
+        <div className="absolute bottom-4 left-4 right-4 flex flex-row items-center justify-between z-10 gap-2">
+          <h3 className={cn("font-bold text-white leading-tight drop-shadow-md truncate", isSelectMode ? "text-xl" : "text-2xl")}>{bay.bay_name}</h3>
           
           {/* Category Chip */}
           <div className={cn(
-            "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] sm:text-xs font-bold uppercase tracking-wider shadow-sm backdrop-blur-md",
+            "inline-flex shrink-0 items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] sm:text-xs font-bold uppercase tracking-wider shadow-sm backdrop-blur-md",
             bay.category?.toLowerCase().includes("cowboy") 
               ? "bg-amber-500/90 text-white border border-amber-400/30" 
               : bay.category?.toLowerCase().includes("pistol")

@@ -18,7 +18,15 @@ import { Calendar, Clock, AlertTriangle, ShieldX, CheckCircle, XCircle } from "l
 import { toast } from "sonner";
 import { cn } from "@dashboardpack/core/lib/utils";
 import { Treemap, ResponsiveContainer, Tooltip } from "recharts";
-import { budgetData } from "@dashboardpack/core/lib/data";
+
+const revenueData = [
+  { name: "Bay 1 (Marksman)", size: 420000, fill: "var(--chart-1)" },
+  { name: "Bay 2 (Tactical)", size: 300000, fill: "var(--chart-2)" },
+  { name: "Bay 3 (VIP)", size: 260000, fill: "var(--chart-3)" },
+  { name: "Bay 4 (Archery)", size: 180000, fill: "var(--chart-4)" },
+  { name: "Bay 5 (Pistol)", size: 150000, fill: "var(--chart-5)" },
+  { name: "Bay 6 (Rifle)", size: 120000, fill: "var(--chart-1)" },
+];
 
 function TreemapTooltip({
   active,
@@ -252,16 +260,16 @@ export default function DashboardPage() {
         <Card className="xl:col-span-4 h-full">
           <CardHeader className="pb-2">
             <CardTitle className="text-base font-semibold">
-              Budget Allocation
+              Revenue Allocation
             </CardTitle>
             <p className="text-xs text-muted-foreground">
-              Department spending distribution
+              Revenue per Bays
             </p>
           </CardHeader>
           <CardContent className="pt-4">
             <ResponsiveContainer width="100%" height={320}>
               <Treemap
-                data={budgetData}
+                data={revenueData}
                 dataKey="size"
                 nameKey="name"
                 content={<CustomTreemapContent />}

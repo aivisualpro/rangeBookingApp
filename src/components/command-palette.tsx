@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { useRouter } from "next/navigation";
-import { Sun, Moon, FileText, Rocket } from "lucide-react";
+import { Sun, Moon, FileText, ScrollText } from "lucide-react";
 import { useTheme } from "@dashboardpack/core/providers/theme-provider";
 import { navigationItems } from "@/lib/navigation";
 import {
@@ -105,11 +105,11 @@ export function CommandPalette() {
         {/* Actions */}
         <CommandGroup heading="Actions">
           <CommandItem
-            value="new deploy deployment create"
-            onSelect={() => navigateTo("/deployments")}
+            onSelect={() => navigateTo("/logs")}
+            className="flex items-center gap-2 cursor-pointer"
           >
-            <Rocket className="me-2 h-4 w-4" />
-            <span>New Deployment</span>
+            <ScrollText className="h-4 w-4 text-muted-foreground" />
+            <span className="flex-1">View Logs</span>
           </CommandItem>
           <CommandItem value="toggle theme dark light mode" onSelect={toggleTheme}>
             {theme === "dark" ? (

@@ -41,7 +41,6 @@ export const navigationItems: NavItem[] = [
   { label: "Analytics", href: "/analytics", icon: BarChart3, keywords: ["charts", "stats", "metrics"], group: "main" },
   { label: "Servers", href: "/servers", icon: Server, keywords: ["hosts", "machines", "instances", "fleet"], group: "main" },
   { label: "Containers", href: "/containers", icon: Container, keywords: ["docker", "pods", "kubernetes", "k8s"], group: "main" },
-  { label: "Deployments", href: "/deployments", icon: Rocket, badge: "3", keywords: ["releases", "ci", "cd", "pipeline"], group: "main" },
   { label: "Incidents", href: "/incidents", icon: AlertTriangle, badge: "2", keywords: ["alerts", "outages", "on-call", "pagerduty"], group: "main" },
   { label: "Logs", href: "/logs", icon: ScrollText, keywords: ["output", "terminal", "console", "stdout"], group: "main" },
   { label: "Uptime", href: "/uptime", icon: Activity, keywords: ["monitoring", "heartbeat", "ping", "health"], group: "main" },

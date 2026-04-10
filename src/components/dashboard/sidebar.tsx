@@ -79,7 +79,6 @@ export const navGroups: NavGroup[] = [
   {
     label: "Operations",
     items: [
-      { icon: Rocket, label: "Deployments", href: "/deployments", badge: "3" },
       { icon: ScrollText, label: "Logs", href: "/logs" },
     ],
   },

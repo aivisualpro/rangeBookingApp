@@ -262,9 +262,6 @@ export default function DashboardPage() {
             <CardTitle className="text-base font-semibold">
               Revenue Allocation
             </CardTitle>
-            <p className="text-xs text-muted-foreground">
-              Revenue per Bays
-            </p>
           </CardHeader>
           <CardContent className="pt-4">
             <ResponsiveContainer width="100%" height={320}>

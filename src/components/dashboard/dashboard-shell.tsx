@@ -32,7 +32,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
           )}
         >
           <Header />
-          <main id="main-content" className="flex-1 flex flex-col min-h-0 overflow-hidden p-4 sm:p-6">
+          <main id="main-content" className="flex-1 flex flex-col min-h-0 overflow-y-auto overflow-x-hidden p-4 sm:p-6">
             <PageTransition>{children}</PageTransition>
           </main>
         </div>

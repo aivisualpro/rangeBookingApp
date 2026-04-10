@@ -57,7 +57,7 @@ export async function POST(req: Request) {
       const populatedCompany = user.company_id as any;
       companyIdStr = populatedCompany._id.toString();
       companyName = populatedCompany.company_name;
-      userName = user.full_name;
+      userName = `${user.first_name || ""} ${user.last_name || ""}`.trim();
     } else {
       companyIdStr = body.company_id || null; // allow superadmin to supply company id if needed, else omit
     }

@@ -417,27 +417,34 @@ export default function DashboardPage() {
             <div className="flex items-start justify-between">
               <div className="flex items-center gap-2">
                 <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-chart-1/10">
-                  <Server className="h-4 w-4 text-chart-1" />
+                  <TrendingUp className="h-4 w-4 text-chart-1" />
                 </div>
                 <div>
                   <CardTitle className="text-sm font-semibold">Top 5 company</CardTitle>
-                  <p className="text-[11px] text-muted-foreground font-mono">10.0.1.13</p>
                 </div>
               </div>
-              <Badge variant="success" className="text-[10px]">Online</Badge>
             </div>
           </CardHeader>
-          <CardContent className="space-y-3">
-            <div className="flex items-center justify-between text-xs text-muted-foreground">
-              <span className="flex items-center gap-1"><Globe className="h-3 w-3" />us-east-1</span>
-              <span>Ubuntu 22.04</span>
+          <CardContent className="space-y-4">
+            <div className="flex justify-between items-center text-sm pb-1">
+              <span className="font-medium">1. Globex Corp</span>
+              <span className="font-mono font-semibold text-chart-1">$8,450,000</span>
             </div>
-            <GaugeBar label="CPU" value={52} icon={Cpu} />
-            <GaugeBar label="Memory" value={71} icon={HardDrive} />
-            <GaugeBar label="Disk" value={35} icon={HardDrive} />
-            <div className="flex items-center gap-1 pt-1 text-[11px] text-muted-foreground">
-              <Clock className="h-3 w-3" />
-              Uptime: 14d 6h
+            <div className="flex justify-between items-center text-sm pb-1">
+              <span className="font-medium">2. Acme Innovations</span>
+              <span className="font-mono font-semibold text-chart-1">$6,230,000</span>
+            </div>
+            <div className="flex justify-between items-center text-sm pb-1">
+              <span className="font-medium">3. Initech Solutions</span>
+              <span className="font-mono font-semibold text-chart-1">$4,915,000</span>
+            </div>
+            <div className="flex justify-between items-center text-sm pb-1">
+              <span className="font-medium">4. Stark Industries</span>
+              <span className="font-mono font-semibold text-chart-2">$3,120,000</span>
+            </div>
+            <div className="flex justify-between items-center text-sm pb-1">
+              <span className="font-medium">5. Virtucon Systems</span>
+              <span className="font-mono font-semibold text-chart-2">$1,895,000</span>
             </div>
           </CardContent>
         </Card>

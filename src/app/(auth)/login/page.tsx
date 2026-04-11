@@ -7,6 +7,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useState, useEffect, Suspense } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import Script from "next/script";
+import Image from "next/image";
 
 import { Button } from "@dashboardpack/core/components/ui/button";
 import { Input } from "@dashboardpack/core/components/ui/input";
@@ -90,10 +91,13 @@ function LoginForm() {
         </div>
       )}
 
-      <Card className="w-full mx-auto max-w-md shadow-xl lg:max-w-[450px] animate-in fade-in slide-in-from-right-4 duration-500">
-        <CardHeader className="text-center">
-          <CardTitle className="text-2xl">Welcome back</CardTitle>
-          <CardDescription>Sign in to your account</CardDescription>
+      <Card className="w-full mx-auto max-w-md shadow-xl lg:max-w-[450px] animate-in fade-in slide-in-from-right-4 duration-500 border-border/60">
+        <CardHeader className="text-center flex flex-col items-center justify-center">
+          <div className="flex h-14 w-14 mb-3 shrink-0 items-center justify-center rounded-[12px] overflow-hidden bg-transparent ring-1 ring-border/50 shadow-sm">
+            <Image src="/logo.png" alt="Range Booking App" width={56} height={56} className="object-cover w-full h-full" />
+          </div>
+          <CardTitle className="text-2xl font-bold tracking-tight">Welcome back</CardTitle>
+          <CardDescription className="text-muted-foreground">Sign in to your account</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">

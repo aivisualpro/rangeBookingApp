@@ -21,6 +21,7 @@ interface FacetedFilterConfig {
 
 interface DataTableToolbarProps<TData> {
   table: Table<TData>;
+  searchPlaceholder?: string;
   facetedFilters?: FacetedFilterConfig[];
   bulkActions?: (selectedRows: TData[]) => React.ReactNode;
 }

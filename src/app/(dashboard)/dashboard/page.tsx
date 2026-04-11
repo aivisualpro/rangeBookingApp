@@ -13,7 +13,7 @@ import { Button } from "@dashboardpack/core/components/ui/button";
 import { Input } from "@dashboardpack/core/components/ui/input";
 import { Progress } from "@dashboardpack/core/components/ui/progress";
 import { DataTable, DataTableColumnHeader } from "@/components/shared/data-table";
-import { HeaderSearchPortal } from "@/components/dashboard/header-portal";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@dashboardpack/core/components/ui/dropdown-menu";
 import type { ColumnDef } from "@tanstack/react-table";
 import { Calendar, Clock, AlertTriangle, ShieldX, CheckCircle, XCircle, Server, Cpu, HardDrive, Globe, TrendingUp, Users, Activity, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
@@ -236,8 +236,6 @@ export default function DashboardPage() {
   const { data: companies = [], isLoading: companiesLoading } = useAPI<any[]>("/api/companies");
   const { data: users = [], isLoading: usersLoading } = useAPI<any[]>("/api/users");
 
-  const [globalFilter, setGlobalFilter] = useState("");
-
   const now = new Date();
   const todayStr = useMemo(() => {
     // Format YYYY-MM-DD in local time
@@ -314,10 +312,7 @@ export default function DashboardPage() {
     },
   ];
 
-  const filteredBookings = recentBookings.filter(b => {
-    const searchStr = `${b.reference_id} ${b.company_name_snapshot} ${b.bay_name_snapshot} ${b.booking_date}`.toLowerCase();
-    return searchStr.includes(globalFilter.toLowerCase());
-  });
+  const filteredBookings = recentBookings;
 
   // Extract unique companies and bays for faceted filters
   const uniqueCompanies = Array.from(new Set(bookings.map(b => b.company_name_snapshot))).sort();
@@ -325,15 +320,6 @@ export default function DashboardPage() {
 
   return (
     <>
-      <HeaderSearchPortal>
-        <Input
-          placeholder="Search by ref, company, bay, date..."
-          value={globalFilter}
-          onChange={(e) => setGlobalFilter(e.target.value)}
-          className="h-9 w-full sm:w-80 bg-background"
-        />
-      </HeaderSearchPortal>
-
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
         <Card className="hover:border-primary/50 transition-colors">
           <CardHeader className="flex flex-row items-center justify-between pb-2">

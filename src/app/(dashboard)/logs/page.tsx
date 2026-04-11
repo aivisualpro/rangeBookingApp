@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from "react";
 import { HeaderSearchPortal } from "@/components/dashboard/header-portal";
-import { useAPI } from "@/components/shared/api-provider";
+import { useAPI } from "@/lib/use-api";
 import { Card, CardContent } from "@dashboardpack/core/components/ui/card";
 import { Badge } from "@dashboardpack/core/components/ui/badge";
 import { Input } from "@dashboardpack/core/components/ui/input";

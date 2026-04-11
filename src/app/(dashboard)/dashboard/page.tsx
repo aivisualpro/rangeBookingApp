@@ -638,11 +638,8 @@ export default function DashboardPage() {
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-base font-semibold">
-              Requests & Latency Trend
+              Yearly Revenue
             </CardTitle>
-            <p className="text-xs text-muted-foreground">
-              Combined view of requests (area), latency (bars), and growth rate (line)
-            </p>
           </CardHeader>
           <CardContent className="pt-4">
             <ResponsiveContainer width="100%" height={360}>
@@ -660,7 +657,7 @@ export default function DashboardPage() {
                 <Tooltip content={<ComboTooltip />} />
                 <Legend wrapperStyle={{ color: "var(--muted-foreground)", fontSize: 12 }} />
                 <Area yAxisId="left" type="monotone" dataKey="revenue" name="Revenue" stroke="var(--chart-1)" strokeWidth={2} fill="url(#comboRevGrad)" dot={false} />
-                <Bar yAxisId="right" dataKey="orders" name="Requests" fill="var(--chart-3)" radius={[4, 4, 0, 0]} maxBarSize={28} opacity={0.8} />
+                <Bar yAxisId="right" dataKey="orders" name="Booking Quantities" fill="var(--chart-3)" radius={[4, 4, 0, 0]} maxBarSize={28} opacity={0.8} />
                 <Line yAxisId="right" type="monotone" dataKey="growth" name="Growth %" stroke="var(--chart-5)" strokeWidth={2} dot={false} strokeDasharray="5 5" />
               </ComposedChart>
             </ResponsiveContainer>

@@ -221,6 +221,16 @@ const categoryRevenueData = [
   { name: "Other", value: 22, amount: 1650000, fill: "var(--chart-3)" },
 ];
 
+const bayOccupancyData = [
+  { subject: "Bay 1", current: 92, previous: 80 },
+  { subject: "Bay 2", current: 85, previous: 90 },
+  { subject: "Bay 3", current: 76, previous: 70 },
+  { subject: "Bay 4", current: 64, previous: 50 },
+  { subject: "Bay 5", current: 100, previous: 95 },
+  { subject: "Bay 6", current: 30, previous: 25 },
+  { subject: "Bay 7", current: 0, previous: 0 },
+];
+
 export default function DashboardPage() {
   const { data: bookings = [], isLoading: bookingsLoading, mutate: mutateBookings } = useAPI<any[]>("/api/bookings");
   const { data: companies = [], isLoading: companiesLoading } = useAPI<any[]>("/api/companies");
@@ -474,15 +484,12 @@ export default function DashboardPage() {
           <Card className="flex-1 h-full">
             <CardHeader className="pb-2">
               <CardTitle className="text-base font-semibold">
-                Team Skills Assessment
+                Bay Occupancy
               </CardTitle>
-              <p className="text-xs text-muted-foreground">
-                Current vs previous quarter competencies
-              </p>
             </CardHeader>
             <CardContent className="pt-4">
               <ResponsiveContainer width="100%" height={320}>
-                <RadarChart cx="50%" cy="50%" outerRadius="70%" data={skillsData}>
+                <RadarChart cx="50%" cy="50%" outerRadius="70%" data={bayOccupancyData}>
                   <PolarGrid stroke="var(--border)" strokeOpacity={0.5} />
                   <PolarAngleAxis
                     dataKey="subject"

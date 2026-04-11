@@ -216,6 +216,11 @@ const baysData = [
   { name: "Bay 7 - Virtual Simulator", status: "low" as BayTrendStatus, currentCap: "0%", days: generateDays(["empty", "empty", "empty", "empty", "empty", "empty", "empty"]) },
 ];
 
+const categoryRevenueData = [
+  { name: "Cowboy", value: 78, fill: "var(--chart-1)" },
+  { name: "Other", value: 22, fill: "var(--chart-3)" },
+];
+
 export default function DashboardPage() {
   const { data: bookings = [], isLoading: bookingsLoading, mutate: mutateBookings } = useAPI<any[]>("/api/bookings");
   const { data: companies = [], isLoading: companiesLoading } = useAPI<any[]>("/api/companies");
@@ -527,11 +532,8 @@ export default function DashboardPage() {
           <Card className="flex-1 h-full">
             <CardHeader className="pb-2">
               <CardTitle className="text-base font-semibold">
-                Device Usage
+                Category Revenue
               </CardTitle>
-              <p className="text-xs text-muted-foreground">
-                Session distribution by device type
-              </p>
             </CardHeader>
             <CardContent className="pt-4">
               <div className="flex flex-col items-center gap-4">
@@ -542,7 +544,7 @@ export default function DashboardPage() {
                       cy="50%"
                       innerRadius="25%"
                       outerRadius="90%"
-                      data={deviceUsageData}
+                      data={categoryRevenueData}
                       startAngle={90}
                       endAngle={-270}
                     >
@@ -574,7 +576,7 @@ export default function DashboardPage() {
                   </ResponsiveContainer>
                 </div>
                 <div className="w-full space-y-3">
-                  {deviceUsageData.map((item) => (
+                  {categoryRevenueData.map((item) => (
                     <div
                       key={item.name}
                       className="flex items-center justify-between"

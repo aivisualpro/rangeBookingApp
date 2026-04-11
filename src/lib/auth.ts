@@ -19,7 +19,7 @@ export const authOptions: NextAuthOptions = {
         }
 
         if (credentials.email === "adeel@symxlogistics.com" && credentials.password === "gigMox-tiqpah-1jyxgy") {
-          return { id: "superadmin_adeel", email: credentials.email, name: "Adeel (Super Admin)" };
+          return { id: "superadmin_adeel", email: credentials.email, name: "Adeel Jabbar", role: "Super Admin" };
         }
 
         await connectToDatabase();

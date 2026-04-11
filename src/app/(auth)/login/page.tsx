@@ -94,7 +94,7 @@ function LoginForm() {
       <Card className="w-full mx-auto max-w-md shadow-xl lg:max-w-[450px] animate-in fade-in slide-in-from-right-4 duration-500 border-border/60">
         <CardHeader className="text-center flex flex-col items-center justify-center">
           <div className="flex h-14 w-14 mb-3 shrink-0 items-center justify-center rounded-[12px] overflow-hidden bg-transparent ring-1 ring-border/50 shadow-sm">
-            <Image src="/logo.png" alt="Range Booking App" width={56} height={56} className="object-cover w-full h-full" />
+            <Image src="/logo.png?v=minimal" alt="Range Booking App" width={56} height={56} className="object-cover w-full h-full" />
           </div>
           <CardTitle className="text-2xl font-bold tracking-tight">Welcome back</CardTitle>
           <CardDescription className="text-muted-foreground">Sign in to your account</CardDescription>

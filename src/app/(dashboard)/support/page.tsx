@@ -14,24 +14,28 @@ import { cn } from "@dashboardpack/core/lib/utils";
 
 const faqs = [
   {
-    question: "How do I customize the theme colors?",
-    answer: "All colors are defined as CSS custom properties in src/app/globals.css using OKLCh format. Edit the :root and .dark blocks to change any color. The dashboard will update automatically since all components reference these tokens.",
+    question: "Who can book a bay?",
+    answer: "You must belong to an approved company to log in and book bays. Your account will only show the specific bays that your company has active authorization to use.",
   },
   {
-    question: "How do I add a new page to the dashboard?",
-    answer: "Create a new file in src/app/(dashboard)/your-page/page.tsx. It will automatically inherit the dashboard layout with sidebar and header. Add the route to the navigation in src/lib/navigation.ts to make it appear in the sidebar.",
+    question: "How is the booking price calculated?",
+    answer: "Pricing is calculated based on a per-person rate, but every transaction is subject to a minimum booking fee. Your final quote will never drop below the minimum fee for your selected bay.",
   },
   {
-    question: "Can I use this template with a backend?",
-    answer: "Yes! The template is backend-agnostic. Replace the mock data in each page with your actual API calls. The Servers, Deployments, and Incidents pages demonstrate how data flows through the app.",
+    question: "Is there a discount for booking on the same day?",
+    answer: "Yes! Same-day bookings automatically trigger a lower, flat-configured rate structure. Any bookings reserved for future dates will correctly process using the standard rate.",
   },
   {
-    question: "How do I deploy to production?",
-    answer: "Run 'npm run build' to create an optimized production build, then 'npm run start' to serve it. For Vercel deployment, simply connect your repo and it will be auto-deployed. Check the /docs/deployment page for more details.",
+    question: "How do I book Bay 2 or Bay 3?",
+    answer: "By operational rule, booking either Bay 2 or Bay 3 requires both bays to be safely reserved simultaneously. They represent a joint operational zone and cannot be split.",
   },
   {
-    question: "Is dark mode supported?",
-    answer: "Yes, full dark/light/system mode support is built in. The ThemeProvider manages the theme state and persists the user's preference to localStorage. Toggle it from the header icon or the Settings > Appearance page.",
+    question: "Why can't I see who else is booked at the facility?",
+    answer: "For privacy and operational security, external users can exclusively see their own company's bookings. Unavailable times across the facility are simply marked as blocked or unavailable.",
+  },
+  {
+    question: "What are the insurance requirements (COI)?",
+    answer: "Your company must maintain an active Certificate of Insurance (COI) on file. COI expiration dates are proactively tracked in the system, and expired records will issue an email warning and restrict booking capabilities.",
   },
 ];
 

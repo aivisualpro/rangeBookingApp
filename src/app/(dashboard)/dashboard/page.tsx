@@ -18,7 +18,7 @@ import type { ColumnDef } from "@tanstack/react-table";
 import { Calendar, Clock, AlertTriangle, ShieldX, CheckCircle, XCircle, Server, Cpu, HardDrive, Globe, TrendingUp, Users, Activity, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@dashboardpack/core/lib/utils";
-import { Treemap, ResponsiveContainer, Tooltip, RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Legend, ComposedChart, Area, Bar, Line, XAxis, YAxis, CartesianGrid, RadialBarChart, RadialBar } from "recharts";
+import { Treemap, ResponsiveContainer, Tooltip, RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Legend, ComposedChart, Area, Bar, Line, XAxis, YAxis, CartesianGrid, RadialBarChart, RadialBar, PieChart, Pie, Cell } from "recharts";
 import { skillsData, comboData, deviceUsageData } from "@dashboardpack/core/lib/data";
 
 interface TooltipPayloadEntry {
@@ -535,64 +535,69 @@ export default function DashboardPage() {
                 Category Revenue
               </CardTitle>
             </CardHeader>
-            <CardContent className="pt-4">
-              <div className="flex flex-col items-center gap-4">
-                <div className="h-52 w-52">
+            <CardContent className="pt-6">
+              <div className="flex flex-col items-center gap-6">
+                <div className="relative h-56 w-56 flex items-center justify-center">
+                  <div className="absolute inset-0 flex flex-col items-center justify-center translate-y-[-2px]">
+                    <span className="text-[11px] font-bold text-muted-foreground uppercase tracking-widest">Total</span>
+                    <span className="text-3xl font-black text-foreground mt-0.5 tracking-tighter leading-none">$7.5M</span>
+                  </div>
                   <ResponsiveContainer width="100%" height="100%">
-                    <RadialBarChart
-                      cx="50%"
-                      cy="50%"
-                      innerRadius="25%"
-                      outerRadius="90%"
-                      data={categoryRevenueData}
-                      startAngle={90}
-                      endAngle={-270}
-                    >
-                      <RadialBar
+                    <PieChart>
+                      <Pie
+                        data={categoryRevenueData}
+                        cx="50%"
+                        cy="50%"
+                        innerRadius={74}
+                        outerRadius={96}
+                        paddingAngle={6}
                         dataKey="value"
-                        background={{ fill: "var(--muted)", opacity: 0.3 }}
-                        cornerRadius={6}
-                      />
+                        stroke="var(--background)"
+                        strokeWidth={3}
+                        cornerRadius={8}
+                      >
+                        {categoryRevenueData.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={entry.fill} className="drop-shadow-sm hover:opacity-80 transition-opacity outline-none" style={{ filter: `drop-shadow(0 4px 6px ${entry.fill}20)` }} />
+                        ))}
+                      </Pie>
                       <Tooltip
                         content={({ active, payload }) => {
                           if (!active || !payload?.length) return null;
-                          const item = payload[0].payload as {
-                            name: string;
-                            value: number;
-                          };
+                          const item = payload[0].payload;
                           return (
-                            <div className="rounded-lg border border-border bg-popover px-3 py-2 shadow-xl">
-                              <p className="text-xs font-medium text-muted-foreground">
-                                {item.name}
-                              </p>
-                              <p className="text-sm font-semibold">
-                                {item.value}%
-                              </p>
+                            <div className="rounded-xl border border-border/40 bg-background/95 backdrop-blur-md px-4 py-3 shadow-2xl">
+                              <div className="flex items-center gap-2 mb-1.5">
+                                <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: item.fill }} />
+                                <p className="text-sm font-semibold text-foreground tracking-tight">{item.name}</p>
+                              </div>
+                              <p className="text-xl font-bold font-mono tracking-tighter leading-none">${item.amount.toLocaleString()}</p>
+                              <p className="text-xs text-muted-foreground font-medium mt-1 uppercase tracking-wider">{item.value}% Share</p>
                             </div>
                           );
                         }}
                       />
-                    </RadialBarChart>
+                    </PieChart>
                   </ResponsiveContainer>
                 </div>
-                <div className="w-full space-y-3">
+                <div className="w-full space-y-2.5">
                   {categoryRevenueData.map((item) => (
                     <div
                       key={item.name}
-                      className="flex items-center justify-between group cursor-pointer"
+                      className="flex items-center justify-between group cursor-pointer bg-muted/10 hover:bg-muted/40 border border-border/30 rounded-xl p-3.5 transition-all outline-none"
                     >
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-3">
                         <div
-                          className="h-2.5 w-2.5 rounded-full"
-                          style={{ backgroundColor: item.fill }}
+                          className="h-3.5 w-3.5 rounded-[4px] shadow-sm transform group-hover:scale-110 transition-transform duration-300"
+                          style={{ backgroundColor: item.fill, boxShadow: `0 0 10px ${item.fill}40` }}
                         />
-                        <span className="text-xs text-muted-foreground group-hover:text-foreground transition-colors">
+                        <span className="text-sm font-semibold text-foreground/80 group-hover:text-foreground transition-colors">
                           {item.name}
                         </span>
                       </div>
-                      <span className="text-xs font-semibold font-mono tracking-tight">
-                        ${item.amount.toLocaleString()} ({item.value}%)
-                      </span>
+                      <div className="flex flex-col items-end gap-0.5">
+                        <span className="text-sm font-bold font-mono tracking-tight text-foreground transition-colors">${item.amount.toLocaleString()}</span>
+                        <span className="text-[10px] uppercase font-bold text-muted-foreground/50 group-hover:text-muted-foreground/70 transition-colors">{item.value}% Share</span>
+                      </div>
                     </div>
                   ))}
                 </div>

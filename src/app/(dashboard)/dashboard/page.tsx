@@ -426,25 +426,44 @@ export default function DashboardPage() {
             </div>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="flex justify-between items-center text-sm pb-1">
-              <span className="font-medium">1. Globex Corp</span>
-              <span className="font-mono font-semibold text-chart-1">$8,450,000</span>
+            <div className="space-y-1.5">
+              <div className="flex justify-between items-center text-xs">
+                <span className="font-medium text-muted-foreground">1. Globex Corp</span>
+                <span className="font-mono font-semibold text-chart-1">$8,450,000</span>
+              </div>
+              <Progress value={100} className="h-1.5 [&>div]:bg-chart-1" />
             </div>
-            <div className="flex justify-between items-center text-sm pb-1">
-              <span className="font-medium">2. Acme Innovations</span>
-              <span className="font-mono font-semibold text-chart-1">$6,230,000</span>
+            
+            <div className="space-y-1.5">
+              <div className="flex justify-between items-center text-xs">
+                <span className="font-medium text-muted-foreground">2. Acme Innovations</span>
+                <span className="font-mono font-semibold text-chart-1">$6,230,000</span>
+              </div>
+              <Progress value={74} className="h-1.5 [&>div]:bg-chart-1" />
             </div>
-            <div className="flex justify-between items-center text-sm pb-1">
-              <span className="font-medium">3. Initech Solutions</span>
-              <span className="font-mono font-semibold text-chart-1">$4,915,000</span>
+
+            <div className="space-y-1.5">
+              <div className="flex justify-between items-center text-xs">
+                <span className="font-medium text-muted-foreground">3. Initech Solutions</span>
+                <span className="font-mono font-semibold text-chart-1">$4,915,000</span>
+              </div>
+              <Progress value={58} className="h-1.5 [&>div]:bg-chart-1" />
             </div>
-            <div className="flex justify-between items-center text-sm pb-1">
-              <span className="font-medium">4. Stark Industries</span>
-              <span className="font-mono font-semibold text-chart-2">$3,120,000</span>
+
+            <div className="space-y-1.5">
+              <div className="flex justify-between items-center text-xs">
+                <span className="font-medium text-muted-foreground">4. Stark Industries</span>
+                <span className="font-mono font-semibold text-chart-2">$3,120,000</span>
+              </div>
+              <Progress value={37} className="h-1.5 [&>div]:bg-chart-2" />
             </div>
-            <div className="flex justify-between items-center text-sm pb-1">
-              <span className="font-medium">5. Virtucon Systems</span>
-              <span className="font-mono font-semibold text-chart-2">$1,895,000</span>
+
+            <div className="space-y-1.5">
+              <div className="flex justify-between items-center text-xs">
+                <span className="font-medium text-muted-foreground">5. Virtucon Systems</span>
+                <span className="font-mono font-semibold text-chart-2">$1,895,000</span>
+              </div>
+              <Progress value={22} className="h-1.5 [&>div]:bg-chart-2" />
             </div>
           </CardContent>
         </Card>

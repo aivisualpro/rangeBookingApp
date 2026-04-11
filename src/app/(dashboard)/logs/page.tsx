@@ -104,7 +104,7 @@ export default function LogsPage() {
 
                 return (
                   <div
-                    key={log.id}
+                    key={log.id ?? `log-${i}`}
                     className={cn(
                       "flex flex-col gap-1 px-4 py-3 font-mono text-xs transition-colors hover:bg-muted/30 sm:flex-row sm:items-center sm:gap-3",
                       i % 2 === 0 ? "bg-background" : "bg-muted/10"

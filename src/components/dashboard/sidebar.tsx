@@ -244,25 +244,6 @@ function SidebarContent({ collapsed }: { collapsed: boolean }) {
         )}
       </div>
 
-      <div className="px-3 pb-2 pt-4 border-b border-sidebar-border mb-2">
-        {!collapsed ? (
-          <button
-            onClick={() => document.dispatchEvent(new KeyboardEvent("keydown", { key: "k", metaKey: true }))}
-            className="flex h-9 w-full items-center rounded-lg border border-input bg-sidebar-accent/50 ps-3 pe-2 text-start text-sm text-sidebar-foreground/70 transition-colors hover:bg-sidebar-accent"
-          >
-            <Search className="h-4 w-4 mr-2 opacity-50" />
-            <span className="flex-1 opacity-70">Search...</span>
-            <kbd className="pointer-events-none rounded border border-border bg-sidebar px-1.5 text-[10px] font-medium opacity-50">⌘K</kbd>
-          </button>
-        ) : (
-          <button
-            onClick={() => document.dispatchEvent(new KeyboardEvent("keydown", { key: "k", metaKey: true }))}
-            className="flex h-9 w-9 items-center justify-center rounded-lg hover:bg-sidebar-accent mx-auto text-sidebar-foreground/50 transition-colors hover:text-sidebar-foreground"
-          >
-            <Search className="h-4 w-4" />
-          </button>
-        )}
-      </div>
 
       {/* Main nav */}
       <nav

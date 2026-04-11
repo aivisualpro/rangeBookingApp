@@ -700,10 +700,6 @@ export default function DashboardPage() {
                         />
                       ))}
                     </div>
-                    <div className="flex justify-between text-[10px] text-muted-foreground">
-                      <span>30 days ago</span>
-                      <span>Today</span>
-                    </div>
                   </div>
                 );
               })}

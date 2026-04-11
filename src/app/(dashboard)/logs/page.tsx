@@ -22,32 +22,78 @@ export default function LogsPage() {
   const displayLogs = useMemo(() => {
     let raw: any[] = [];
     if (activeTab === "bookings") {
-      raw = bookings.map((b: any) => ({
-        id: b._id,
-        sortTime: b.createdAt ? new Date(b.createdAt).getTime() : 0,
-        ts: b.createdAt ? new Date(b.createdAt).toISOString() : "Unknown Date",
-        level: b.status === "Approved" ? "INFO" : b.status === "Denied" ? "ERROR" : "WARN",
-        service: "api/bookings",
-        msg: `Booking ${b.reference_id} [${b.status}] requested by ${b.company_name_snapshot} for ${b.bay_name_snapshot}`
-      }));
+      bookings.forEach((b: any) => {
+        // Spread nested audit log changes into atomic line items
+        if (b.audit_log && Array.isArray(b.audit_log)) {
+          b.audit_log.forEach((item: any, idx: number) => {
+            raw.push({
+              id: `${b._id}-audit-${idx}`,
+              sortTime: new Date(item.timestamp).getTime(),
+              ts: new Date(item.timestamp).toISOString(),
+              level: item.action.includes("Denied") || item.action.includes("Cancelled") ? "ERROR" : item.action.includes("Created") ? "INFO" : "WARN",
+              service: "api/bookings/audit",
+              msg: `[${b.reference_id}] ${item.action} — ${item.details || "No details provided"}`
+            });
+          });
+        }
+        
+        // Also log current final state point
+        const dateStr = b.updatedAt || b.createdAt;
+        raw.push({
+          id: b._id,
+          sortTime: dateStr ? new Date(dateStr).getTime() : 0,
+          ts: dateStr ? new Date(dateStr).toISOString() : "Unknown Date",
+          level: b.status === "Approved" ? "INFO" : b.status === "Denied" ? "ERROR" : "WARN",
+          service: "api/bookings/state",
+          msg: `Latest Sync: Booking ${b.reference_id} [${b.status}] requested by ${b.company_name_snapshot} for ${b.bay_name_snapshot}`
+        });
+      });
     } else if (activeTab === "companies") {
-      raw = companies.map((c: any) => ({
-        id: c._id,
-        sortTime: c.createdAt ? new Date(c.createdAt).getTime() : 0,
-        ts: c.createdAt ? new Date(c.createdAt).toISOString() : "Unknown Date",
-        level: c.status === "Active" ? "INFO" : "WARN",
-        service: "api/companies",
-        msg: `Company profile ${c.name} modified (Status: ${c.status}) — Insurance Expires: ${c.coi_expiration_date ? new Date(c.coi_expiration_date).toDateString() : "N/A"}`
-      }));
+      companies.forEach((c: any) => {
+        if (c.createdAt) {
+          raw.push({
+            id: `${c._id}-created`,
+            sortTime: new Date(c.createdAt).getTime(),
+            ts: new Date(c.createdAt).toISOString(),
+            level: "INFO",
+            service: "api/companies/create",
+            msg: `Company profile initialized: ${c.name}`
+          });
+        }
+        if (c.updatedAt && c.updatedAt !== c.createdAt) {
+          raw.push({
+            id: `${c._id}-updated`,
+            sortTime: new Date(c.updatedAt).getTime(),
+            ts: new Date(c.updatedAt).toISOString(),
+            level: c.status === "Active" ? "INFO" : "WARN",
+            service: "api/companies/update",
+            msg: `Company profile ${c.name} modified (Status: ${c.status}) — Insurance Expires: ${c.coi_expiration_date ? new Date(c.coi_expiration_date).toDateString() : "N/A"}`
+          });
+        }
+      });
     } else if (activeTab === "users") {
-      raw = users.map((u: any) => ({
-        id: u._id,
-        sortTime: u.createdAt ? new Date(u.createdAt).getTime() : 0,
-        ts: u.createdAt ? new Date(u.createdAt).toISOString() : "Unknown Date",
-        level: u.role === "admin" ? "DEBUG" : "INFO",
-        service: "api/users",
-        msg: `User account ${u.username} (${u.role}) modified. Associated target mapping ID: ${u.company_id || "System Administration"}`
-      }));
+      users.forEach((u: any) => {
+        if (u.createdAt) {
+          raw.push({
+            id: `${u._id}-created`,
+            sortTime: new Date(u.createdAt).getTime(),
+            ts: new Date(u.createdAt).toISOString(),
+            level: u.role === "admin" ? "DEBUG" : "INFO",
+            service: "api/users/create",
+            msg: `User structured: ${u.username} (${u.role})`
+          });
+        }
+        if (u.updatedAt && u.updatedAt !== u.createdAt) {
+          raw.push({
+            id: `${u._id}-updated`,
+            sortTime: new Date(u.updatedAt).getTime(),
+            ts: new Date(u.updatedAt).toISOString(),
+            level: u.role === "admin" ? "DEBUG" : "INFO",
+            service: "api/users/update",
+            msg: `User payload modified: ${u.username} (${u.role}). Target company bind: ${u.company_id || "System Default"}`
+          });
+        }
+      });
     }
     
     return raw.filter((log) => {

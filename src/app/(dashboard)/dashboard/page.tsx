@@ -420,7 +420,7 @@ export default function DashboardPage() {
                   <Server className="h-4 w-4 text-chart-1" />
                 </div>
                 <div>
-                  <CardTitle className="text-sm font-semibold">prod-web-02</CardTitle>
+                  <CardTitle className="text-sm font-semibold">Top 5 company</CardTitle>
                   <p className="text-[11px] text-muted-foreground font-mono">10.0.1.13</p>
                 </div>
               </div>

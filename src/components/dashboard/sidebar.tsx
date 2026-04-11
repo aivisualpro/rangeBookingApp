@@ -234,7 +234,7 @@ function SidebarContent({ collapsed }: { collapsed: boolean }) {
       {/* Logo */}
       <div className="flex h-16 items-center gap-3 border-b border-sidebar-border px-4">
         <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[8px] overflow-hidden bg-transparent shadow-sm">
-          <Image src="/logo.png" alt="Range Booking App" width={36} height={36} className="object-cover w-full h-full" />
+          <Image src="/logo.png" unoptimized alt="Range Booking App" width={36} height={36} className="object-cover w-full h-full" />
         </div>
         {!collapsed && (
           <div className="flex flex-col">

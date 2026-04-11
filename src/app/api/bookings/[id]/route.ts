@@ -27,7 +27,7 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ id: s
     }
 
     // Auth check: superadmin or the company owning the booking
-    if (userId !== "superadmin_adeel") {
+    if (!userId.startsWith("superadmin_")) {
        const user = await User.findById(userId).populate("company_id");
        const populatedCompany = user?.company_id as any;
        if (!user || !populatedCompany || populatedCompany._id.toString() !== booking.company_id.toString()) {

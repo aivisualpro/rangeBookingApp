@@ -17,7 +17,7 @@ export async function GET() {
     await connectToDatabase();
     const userId = (session.user as any).id;
 
-    if (userId === "superadmin_adeel") {
+    if (userId.startsWith("superadmin_")) {
       const allActiveBays = await RangeBay.find({ status: "Active" });
       return NextResponse.json({ data: allActiveBays });
     }

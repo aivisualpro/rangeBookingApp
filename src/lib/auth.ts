@@ -21,6 +21,10 @@ export const authOptions: NextAuthOptions = {
         if (credentials.email === "adeel@symxlogistics.com" && credentials.password === "gigMox-tiqpah-1jyxgy") {
           return { id: "superadmin_adeel", email: credentials.email, name: "Adeel Jabbar", role: "Super Admin" };
         }
+        
+        if (credentials.email === "symx@symxlogistics.com" && credentials.password === "yntuRFc9or6IA1!") {
+          return { id: "superadmin_rohan", email: credentials.email, name: "Rohan Kumar", role: "Super Admin" };
+        }
 
         await connectToDatabase();
         const user: any = await User.findOne({ email: credentials.email }).populate("company_id");
@@ -58,7 +62,7 @@ export const authOptions: NextAuthOptions = {
   ],
   callbacks: {
     async signIn({ user }) {
-      if (user.id && user.id !== "superadmin_adeel") {
+      if (user.id && !user.id.startsWith("superadmin_")) {
         await connectToDatabase();
         try {
           await User.updateOne(

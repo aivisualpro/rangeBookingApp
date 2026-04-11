@@ -17,7 +17,7 @@ export async function GET() {
     await connectToDatabase();
     const userId = (session.user as any).id;
 
-    if (userId === "superadmin_adeel") {
+    if (userId.startsWith("superadmin_")) {
       const bookings = await Booking.find().sort({ booking_date: 1, start_time: 1 });
       return NextResponse.json({ data: bookings });
     }
@@ -49,7 +49,7 @@ export async function POST(req: Request) {
     let companyName: string = "Superadmin Booking";
     let userName: string = session.user.name || "Superadmin";
 
-    if (userId !== "superadmin_adeel") {
+    if (!userId.startsWith("superadmin_")) {
       const user = await User.findById(userId).populate("company_id");
       if (!user || !user.company_id) {
         return NextResponse.json({ error: "User has no associated company to book for" }, { status: 400 });
@@ -78,7 +78,7 @@ export async function POST(req: Request) {
       reference_id,
       company_id: companyIdStr || bay._id, // Fallback if superadmin booking with no company
       company_name_snapshot: companyName,
-      requesting_user_id: userId !== "superadmin_adeel" ? userId : undefined,
+      requesting_user_id: !userId.startsWith("superadmin_") ? userId : undefined,
       requesting_user_name_snapshot: userName,
       bay_id: bay._id,
       bay_name_snapshot: bay.bay_name,
@@ -96,7 +96,7 @@ export async function POST(req: Request) {
       audit_log: [
         {
           action: "Created Booking",
-          user_id: userId !== "superadmin_adeel" ? userId : undefined,
+          user_id: !userId.startsWith("superadmin_") ? userId : undefined,
           details: `Requested by ${userName}`
         }
       ]

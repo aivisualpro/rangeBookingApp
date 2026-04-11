@@ -308,9 +308,7 @@ function SidebarContent({ collapsed }: { collapsed: boolean }) {
               pathname === "/profile" && "bg-sidebar-accent/50"
             )}
           >
-            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-sidebar-primary/80 to-sidebar-primary text-[11px] font-bold text-sidebar-primary-foreground">
-              AS
-            </div>
+
             {!collapsed && (
               <div className="flex flex-1 flex-col truncate">
                 <span className="text-sm font-medium text-sidebar-foreground truncate">

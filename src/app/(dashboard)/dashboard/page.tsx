@@ -236,7 +236,6 @@ export default function DashboardPage() {
   const { data: companies = [], isLoading: companiesLoading } = useAPI<any[]>("/api/companies");
   const { data: users = [], isLoading: usersLoading } = useAPI<any[]>("/api/users");
 
-  const totalUsersAndCompanies = (users?.length || 0) + (companies?.length || 0);
   const [globalFilter, setGlobalFilter] = useState("");
 
   const now = new Date();
@@ -395,10 +394,14 @@ export default function DashboardPage() {
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-black">
-              {(usersLoading || companiesLoading) ? "..." : totalUsersAndCompanies.toLocaleString()}
+            <div className="flex items-baseline gap-2">
+              <span className="text-3xl font-black text-foreground">{usersLoading ? "..." : (users?.length || 0)}</span>
+              <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Users</span>
+              <span className="text-muted-foreground/30 px-1 font-light text-xl">/</span>
+              <span className="text-3xl font-black text-foreground">{companiesLoading ? "..." : (companies?.length || 0)}</span>
+              <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Companies</span>
             </div>
-            <div className="flex items-center gap-1 mt-1">
+            <div className="flex items-center gap-1 mt-2">
               <TrendingUp className="h-3 w-3 text-success" />
               <span className="text-[10px] font-semibold text-success tracking-wider">+12.3% this month</span>
             </div>

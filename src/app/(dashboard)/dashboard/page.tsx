@@ -217,8 +217,8 @@ const baysData = [
 ];
 
 const categoryRevenueData = [
-  { name: "Cowboy", value: 78, fill: "var(--chart-1)" },
-  { name: "Other", value: 22, fill: "var(--chart-3)" },
+  { name: "Cowboy", value: 78, amount: 5850000, fill: "var(--chart-1)" },
+  { name: "Other", value: 22, amount: 1650000, fill: "var(--chart-3)" },
 ];
 
 export default function DashboardPage() {
@@ -579,18 +579,20 @@ export default function DashboardPage() {
                   {categoryRevenueData.map((item) => (
                     <div
                       key={item.name}
-                      className="flex items-center justify-between"
+                      className="flex items-center justify-between group cursor-pointer"
                     >
                       <div className="flex items-center gap-2">
                         <div
                           className="h-2.5 w-2.5 rounded-full"
                           style={{ backgroundColor: item.fill }}
                         />
-                        <span className="text-xs text-muted-foreground">
+                        <span className="text-xs text-muted-foreground group-hover:text-foreground transition-colors">
                           {item.name}
                         </span>
                       </div>
-                      <span className="text-xs font-semibold">{item.value}%</span>
+                      <span className="text-xs font-semibold font-mono tracking-tight">
+                        ${item.amount.toLocaleString()} ({item.value}%)
+                      </span>
                     </div>
                   ))}
                 </div>
